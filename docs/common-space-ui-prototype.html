@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>与你AI共同空间 UI 原型</title>
+  <style>
+    :root {
+      --page: #f3f4f8;
+      --phone-page: #f7f7fb;
+      --surface: #ffffff;
+      --text: #1f2333;
+      --muted: #858897;
+      --line: #ededf4;
+      --brand: #6c5ce7;
+      --brand-soft: #efecff;
+      --coral: #e96d68;
+      --coral-soft: #fff0ee;
+      --green: #4f9b6d;
+      --green-soft: #eaf6ee;
+      --blue: #4e79a7;
+      --blue-soft: #eaf1f8;
+      --amber: #d9922e;
+      --amber-soft: #fff4df;
+      --danger: #d85858;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--page); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif; letter-spacing: 0; }
+    body { margin: 0; min-width: 320px; }
+    button, input { font: inherit; letter-spacing: 0; }
+    button { cursor: pointer; }
+
+    .document-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 76px;
+      padding: 14px 28px;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .document-title h1 { margin: 0; font-size: 20px; line-height: 28px; }
+    .document-title p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+    .stage-tabs { display: inline-flex; padding: 4px; background: #eff0f5; border-radius: 8px; }
+    .stage-tab { height: 36px; padding: 0 18px; border: 0; border-radius: 6px; background: transparent; color: #6f7280; font-size: 14px; }
+    .stage-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(37, 31, 72, 0.09); }
+
+    .page-intro { max-width: 1240px; margin: 0 auto; padding: 28px 28px 8px; }
+    .page-intro h2 { margin: 0; font-size: 28px; line-height: 38px; }
+    .page-intro p { max-width: 760px; margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .principles { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .principle { padding: 7px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; color: #555866; font-size: 12px; }
+
+    .prototype-set { display: none; max-width: 1240px; margin: 0 auto; padding: 22px 28px 56px; }
+    .prototype-set.active { display: block; }
+    .screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 34px 26px; align-items: start; }
+    .screen-item { min-width: 0; }
+    .screen-meta { width: min(100%, 375px); margin: 0 auto 10px; }
+    .screen-meta strong { display: block; font-size: 14px; }
+    .screen-meta span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+
+    .phone {
+      position: relative;
+      width: min(100%, 375px);
+      height: 812px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--phone-page);
+      border: 7px solid #232532;
+      border-radius: 28px;
+      box-shadow: 0 20px 52px rgba(29, 28, 48, 0.15);
+    }
+
+    .phone-status { height: 30px; padding: 8px 18px 0; display: flex; justify-content: space-between; color: #383b49; font-size: 11px; font-weight: 600; }
+    .phone-nav { position: relative; height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: center; background: var(--surface); border-bottom: 1px solid var(--line); }
+    .phone-nav strong { font-size: 16px; }
+    .nav-action { position: absolute; left: 15px; width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: transparent; color: #464957; font-size: 22px; }
+    .nav-more { left: auto; right: 15px; font-size: 20px; }
+    .phone-body { height: calc(100% - 78px); overflow: hidden; padding: 16px 16px 104px; }
+    .phone-body.has-bar { padding-bottom: 162px; }
+
+    .eyebrow { color: var(--brand); font-size: 11px; font-weight: 700; }
+    .phone h2 { margin: 7px 0 0; font-size: 23px; line-height: 31px; }
+    .phone h3 { margin: 0; font-size: 15px; line-height: 22px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .section-title { display: flex; justify-content: space-between; align-items: baseline; margin: 20px 0 9px; }
+    .section-title strong { font-size: 15px; }
+    .section-title span { color: var(--muted); font-size: 11px; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+    .list { margin-top: 16px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+    .list-row { min-height: 64px; padding: 11px 13px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid var(--line); }
+    .list-row:last-child { border-bottom: 0; }
+    .row-copy { flex: 1; min-width: 0; }
+    .row-copy strong { display: block; font-size: 14px; line-height: 19px; }
+    .row-copy span { display: block; margin-top: 3px; overflow: hidden; color: var(--muted); font-size: 11px; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+    .row-arrow { color: #a7a9b4; font-size: 21px; }
+
+    .icon-box { flex: 0 0 auto; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 8px; background: var(--brand-soft); color: var(--brand); font-size: 19px; font-weight: 700; }
+    .icon-coral { background: var(--coral-soft); color: var(--coral); }
+    .icon-green { background: var(--green-soft); color: var(--green); }
+    .icon-blue { background: var(--blue-soft); color: var(--blue); }
+    .icon-amber { background: var(--amber-soft); color: var(--amber); }
+
+    .avatar { width: 44px; height: 44px; display: grid; place-items: center; flex: 0 0 auto; overflow: hidden; border-radius: 50%; background: #ffe1d5; color: #7b5247; font-size: 15px; font-weight: 700; }
+    .avatar.pink { background: #f1dfea; color: #7c536a; }
+    .avatar.blue { background: #dceaf8; color: #4f6c83; }
+    .avatar.green { background: #e1f2e7; color: #52735d; }
+    .avatar.amber { background: #f8e8cb; color: #826735; }
+    .avatar.small { width: 36px; height: 36px; font-size: 12px; }
+    .avatar.large { width: 66px; height: 66px; font-size: 22px; border: 3px solid var(--surface); }
+
+    .field { margin-top: 15px; }
+    .field label { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 12px; font-weight: 600; }
+    .field label span { color: var(--muted); font-weight: 400; }
+    .input { width: 100%; height: 48px; padding: 0 13px; border: 1px solid #dedee8; border-radius: 7px; background: var(--surface); color: var(--text); font-size: 14px; outline: 0; }
+    .select-row { min-height: 50px; padding: 0 13px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid #dedee8; border-radius: 7px; font-size: 14px; }
+    .select-row span:last-child { color: #a0a3af; }
+
+    .privacy-note { margin-top: 14px; padding: 11px 12px; display: flex; gap: 9px; background: var(--brand-soft); border-radius: 7px; color: #575078; font-size: 11px; line-height: 17px; }
+    .privacy-note b { color: var(--brand); font-size: 14px; }
+    .primary { width: 100%; height: 48px; border: 0; border-radius: 8px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 600; }
+    .secondary { width: 100%; height: 44px; border: 1px solid #dedee8; border-radius: 8px; background: var(--surface); color: #4f5260; font-size: 13px; }
+    .text-button { border: 0; background: transparent; color: var(--brand); font-size: 12px; }
+    .danger-button { color: var(--danger); border-color: #f0cece; }
+    .fixed-actions { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; padding: 12px 16px 20px; background: var(--surface); border-top: 1px solid var(--line); }
+    .fixed-actions .secondary { margin-top: 8px; }
+
+    .bottom-sheet { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding: 16px 16px 22px; background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -16px 40px rgba(31, 35, 51, 0.12); }
+    .sheet-grip { width: 34px; height: 4px; margin: -6px auto 13px; background: #d9dae2; border-radius: 2px; }
+    .sheet-title { margin-bottom: 10px; font-size: 16px; }
+    .dim { position: absolute; z-index: 5; inset: 78px 0 0; background: rgba(31, 35, 51, 0.34); }
+
+    .invite-visual { margin: 14px 0 18px; display: flex; align-items: center; justify-content: center; }
+    .connector { width: 74px; height: 2px; background: #c9c3fa; position: relative; }
+    .connector::after { content: "共同空间"; position: absolute; left: 50%; top: -11px; transform: translateX(-50%); padding: 3px 6px; background: var(--brand-soft); border-radius: 5px; color: var(--brand); font-size: 9px; white-space: nowrap; }
+    .invite-panel { padding: 15px; text-align: center; }
+    .invite-panel h3 { margin-top: 9px; }
+    .value-list { margin: 13px 0 0; padding: 0; text-align: left; list-style: none; }
+    .value-list li { position: relative; padding: 8px 0 8px 22px; border-top: 1px solid var(--line); color: #555866; font-size: 12px; }
+    .value-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green); font-weight: 700; }
+
+    .space-header { padding: 15px; background: var(--surface); border-bottom: 1px solid var(--line); }
+    .space-switch { display: inline-flex; align-items: center; gap: 5px; color: var(--text); font-size: 12px; font-weight: 600; }
+    .space-identity { display: flex; align-items: center; justify-content: space-between; margin-top: 13px; }
+    .avatar-pair { display: flex; }
+    .avatar-pair .avatar + .avatar { margin-left: -14px; }
+    .space-stats { display: flex; margin-top: 14px; }
+    .space-stat { flex: 1; }
+    .space-stat + .space-stat { padding-left: 14px; border-left: 1px solid var(--line); }
+    .space-stat strong { display: block; font-size: 18px; }
+    .space-stat span { color: var(--muted); font-size: 10px; }
+
+    .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+    .quick-action { min-height: 68px; padding: 9px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: #505361; font-size: 10px; }
+    .quick-action b { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 7px; background: var(--brand-soft); color: var(--brand); font-size: 16px; }
+
+    .event-row { min-height: 68px; padding: 11px 12px; display: flex; align-items: center; gap: 11px; background: var(--surface); border-bottom: 1px solid var(--line); }
+    .event-row:first-child { border-radius: 8px 8px 0 0; }
+    .event-row:last-child { border-bottom: 0; border-radius: 0 0 8px 8px; }
+    .date-box { width: 43px; height: 43px; padding-top: 5px; flex: 0 0 auto; text-align: center; background: var(--coral-soft); border-radius: 7px; color: var(--coral); }
+    .date-box strong { display: block; font-size: 16px; line-height: 17px; }
+    .date-box span { font-size: 9px; }
+    .event-copy { flex: 1; min-width: 0; }
+    .event-copy strong { display: block; font-size: 13px; }
+    .event-copy span { color: var(--muted); font-size: 10px; }
+    .countdown { padding: 5px 7px; background: var(--amber-soft); border-radius: 10px; color: var(--amber); font-size: 9px; }
+
+    .tag { display: inline-flex; align-items: center; min-height: 22px; padding: 0 7px; border-radius: 11px; background: var(--brand-soft); color: var(--brand); font-size: 9px; }
+    .tag.green { background: var(--green-soft); color: var(--green); }
+    .tag.gray { background: #f0f1f4; color: #777a88; }
+    .danger-row .row-copy strong, .danger-row .row-arrow { color: var(--danger); }
+
+    .family-band { margin: -16px -16px 0; padding: 16px; background: #eef6f1; border-bottom: 1px solid #dfece3; }
+    .family-top { display: flex; align-items: center; justify-content: space-between; }
+    .family-name { margin-top: 18px; font-size: 25px; line-height: 32px; }
+    .family-meta { margin-top: 4px; color: #68776d; font-size: 11px; }
+    .month-feature { margin-top: 14px; padding: 12px; display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid #dfece3; border-radius: 8px; }
+    .month-feature .date-box { background: var(--green-soft); color: var(--green); }
+
+    .member-strip { display: flex; gap: 14px; overflow: hidden; }
+    .member-chip { flex: 0 0 52px; text-align: center; }
+    .member-chip .avatar { margin: 0 auto; }
+    .member-chip span { display: block; margin-top: 5px; overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+
+    .segmented { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; padding: 3px; background: #edeef3; border-radius: 7px; }
+    .segment { height: 32px; border: 0; border-radius: 5px; background: transparent; color: #777a88; font-size: 11px; }
+    .segment.active { background: var(--surface); color: var(--text); font-weight: 600; }
+    .member-group { margin-top: 17px; }
+    .member-group > strong { display: block; margin-bottom: 7px; color: var(--muted); font-size: 11px; }
+    .member-list { overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+
+    .calendar-month { margin-top: 17px; }
+    .calendar-month > strong { display: block; margin-bottom: 8px; font-size: 14px; }
+    .calendar-line { position: relative; margin-left: 20px; padding-left: 20px; border-left: 1px solid #dedfe8; }
+    .calendar-item { position: relative; min-height: 70px; padding: 11px 12px; margin-bottom: 9px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+    .calendar-item::before { content: ""; position: absolute; left: -25px; top: 22px; width: 9px; height: 9px; border-radius: 50%; background: var(--coral); border: 2px solid var(--phone-page); }
+    .calendar-item .calendar-date { color: var(--coral); font-size: 11px; font-weight: 700; }
+    .calendar-item h3 { margin-top: 4px; }
+    .calendar-item p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+
+    .memory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-top: 12px; }
+    .memory-tile { overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+    .memory-art { height: 108px; padding: 12px; display: flex; align-items: flex-end; background: #dceaf8; color: #4f6c83; font-size: 12px; font-weight: 700; }
+    .memory-art.coral { background: #f6dfdc; color: #845450; }
+    .memory-art.green { background: #dceee2; color: #4d7059; }
+    .memory-copy { padding: 9px; }
+    .memory-copy strong { display: block; font-size: 11px; }
+    .memory-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+
+    .bottom-nav { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 72px; padding: 6px 8px 11px; display: flex; background: rgba(255,255,255,.98); border-top: 1px solid var(--line); }
+    .bottom-nav-item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #9b9dab; font-size: 9px; }
+    .bottom-nav-item b { height: 25px; font-size: 19px; line-height: 25px; }
+    .bottom-nav-item.active { color: var(--brand); }
+
+    .fab { position: absolute; z-index: 4; right: 16px; bottom: 88px; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--brand); color: #fff; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.25); font-size: 25px; }
+    .toast { position: fixed; z-index: 100; left: 50%; bottom: 28px; transform: translate(-50%, 20px); padding: 10px 14px; opacity: 0; pointer-events: none; background: #282a35; border-radius: 7px; color: #fff; font-size: 13px; transition: .18s ease; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 720px) {
+      .document-header { position: static; align-items: flex-start; flex-direction: column; padding: 16px; }
+      .stage-tabs { width: 100%; }
+      .stage-tab { flex: 1; padding: 0 8px; }
+      .page-intro { padding: 22px 16px 4px; }
+      .page-intro h2 { font-size: 23px; }
+      .prototype-set { padding: 18px 12px 44px; }
+      .screen-grid { grid-template-columns: 1fr; gap: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="document-header">
+    <div class="document-title">
+      <h1>与你AI共同空间</h1>
+      <p>移动端 UI 评审原型 · 不包含真实业务逻辑</p>
+    </div>
+    <div class="stage-tabs" role="tablist" aria-label="原型阶段">
+      <button class="stage-tab active" data-stage="couple" role="tab">P0 双人空间</button>
+      <button class="stage-tab" data-stage="family" role="tab">P1 家庭空间</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro">
+      <h2 id="stage-heading">邀请一个人，一起记录重要时刻</h2>
+      <p id="stage-copy">双人空间强调接受邀请后的共同价值，同时在邀请、发布和设置页面持续说明私人内容不会被共享。</p>
+      <div class="principles">
+        <span class="principle">默认私密</span>
+        <span class="principle">主动发布</span>
+        <span class="principle">明确可见范围</span>
+        <span class="principle">可撤回与退出</span>
+      </div>
+    </section>
+
+    <section class="prototype-set active" data-set="couple">
+      <div class="screen-grid">
+        <article class="screen-item">
+          <div class="screen-meta"><strong>CS-01 添加关系</strong><span>区分个人记录与共同空间</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><strong>关系</strong></div>
+            <div class="phone-body">
+              <div class="section-title"><strong>重要的人</strong><span>6 位</span></div>
+              <div class="list">
+                <div class="list-row"><div class="avatar">雨</div><div class="row-copy"><strong>小雨</strong><span>朋友 · 3个纪念日</span></div><span class="row-arrow">›</span></div>
+                <div class="list-row"><div class="avatar blue">林</div><div class="row-copy"><strong>林先生</strong><span>家人 · 生日还有12天</span></div><span class="row-arrow">›</span></div>
+                <div class="list-row"><div class="avatar green">周</div><div class="row-copy"><strong>周姐</strong><span>同事 · 最近联系5天前</span></div><span class="row-arrow">›</span></div>
+              </div>
+            </div>
+            <div class="dim"></div>
+            <div class="bottom-sheet">
+              <div class="sheet-grip"></div>
+              <h3 class="sheet-title">添加关系</h3>
+              <div class="list-row"><div class="icon-box">↗</div><div class="row-copy"><strong>邀请一起记录</strong><span>创建双方共同维护的空间</span></div><span class="row-arrow">›</span></div>
+              <div class="list-row"><div class="icon-box icon-blue">+</div><div class="row-copy"><strong>手动添加关系</strong><span>只有你自己可以看到</span></div><span class="row-arrow">›</span></div>
+              <div class="list-row"><div class="icon-box icon-amber">#</div><div class="row-copy"><strong>接受邀请</strong><span>输入6位邀请码</span></div><span class="row-arrow">›</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>CS-02 发起邀请</strong><span>私人字段与共同字段分层</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>邀请一起记录</strong></div>
+            <div class="phone-body has-bar">
+              <span class="eyebrow">创建双人空间</span>
+              <h2>先告诉我你们的关系</h2>
+              <p class="subtitle">称呼和关系类型只用于你的个人记录。</p>
+              <div class="field"><label>对方称呼 <span>仅自己可见</span></label><input class="input" value="小雨" readonly></div>
+              <div class="field"><label>我与对方的关系 <span>仅自己可见</span></label><div class="select-row"><span>朋友</span><span>›</span></div></div>
+              <div class="field"><label>共同空间名称 <span>双方可见</span></label><input class="input" value="小雨和我的时光" readonly></div>
+              <div class="field"><label>共同纪念日 <span>可以稍后添加</span></label><div class="select-row"><span style="color:#a0a3af">选择日期</span><span>›</span></div></div>
+              <div class="privacy-note"><b>◇</b><span>你的私人备注、标签、提醒和AI记录不会分享给对方。</span></div>
+            </div>
+            <div class="fixed-actions"><button class="primary" data-demo="邀请已生成，可发送给微信好友">生成邀请</button></div>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>CS-03 接受邀请</strong><span>先解释价值，再请求接受</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><strong>与你AI邀请</strong></div>
+            <div class="phone-body has-bar">
+              <div class="invite-visual"><div class="avatar large">我</div><div class="connector"></div><div class="avatar large pink">雨</div></div>
+              <div class="invite-panel card">
+                <span class="eyebrow">来自 小雨</span>
+                <h3>邀请你一起记录彼此的重要时刻</h3>
+                <p class="subtitle">空间名称：小雨和我的时光</p>
+                <ul class="value-list">
+                  <li>一起维护共同纪念日</li>
+                  <li>保存只有你们可见的共同回忆</li>
+                  <li>各自的私人备注仍然完全私密</li>
+                </ul>
+              </div>
+              <div class="privacy-note"><b>✓</b><span>接受邀请不会向小雨公开你已有的关系、备注或AI记录。</span></div>
+              <p class="subtitle" style="text-align:center;margin-top:15px">邀请将在 6 天后过期</p>
+            </div>
+            <div class="fixed-actions"><button class="primary" data-demo="已加入“小雨和我的时光”">接受并进入空间</button><button class="secondary">暂不接受</button></div>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>CS-05 双人空间首页</strong><span>共同纪念日和共同回忆</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-body" style="padding-top:0">
+              <div class="space-header" style="margin:0 -16px">
+                <button class="text-button space-switch">小雨和我的时光⌄</button>
+                <div class="space-identity">
+                  <div><h2 style="margin:0">我们一起的第 986 天</h2><p class="subtitle">下一次纪念日还有 18 天</p></div>
+                  <div class="avatar-pair"><div class="avatar large">我</div><div class="avatar large pink">雨</div></div>
+                </div>
+              </div>
+              <div class="quick-actions">
+                <button class="quick-action"><b>◇</b><span>纪念日</span></button>
+                <button class="quick-action"><b style="background:var(--coral-soft);color:var(--coral)">▣</b><span>共同回忆</span></button>
+                <button class="quick-action"><b style="background:var(--blue-soft);color:var(--blue)">＋</b><span>添加内容</span></button>
+              </div>
+              <div class="section-title"><strong>近期纪念日</strong><span>全部 ›</span></div>
+              <div class="card">
+                <div class="event-row"><div class="date-box"><strong>24</strong><span>九月</span></div><div class="event-copy"><strong>第一次旅行</strong><span>每年重复 · 双方提醒</span></div><span class="countdown">18天</span></div>
+                <div class="event-row"><div class="date-box"><strong>08</strong><span>十月</span></div><div class="event-copy"><strong>小雨的生日</strong><span>由你添加</span></div><span class="tag">共同</span></div>
+              </div>
+              <div class="section-title"><strong>最近回忆</strong><span>更多 ›</span></div>
+              <div class="list-row card"><div class="icon-box icon-coral">照</div><div class="row-copy"><strong>周末一起看了日落</strong><span>由小雨添加 · 8月9日</span></div><span class="tag">共同</span></div>
+            </div>
+            <nav class="bottom-nav"><div class="bottom-nav-item active"><b>⌂</b><span>空间</span></div><div class="bottom-nav-item"><b>◇</b><span>纪念日</span></div><div class="bottom-nav-item"><b>▣</b><span>回忆</span></div><div class="bottom-nav-item"><b>⋯</b><span>设置</span></div></nav>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>CS-07 空间设置</strong><span>隐私、通知和解除关系</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>空间设置</strong></div>
+            <div class="phone-body">
+              <div class="list">
+                <div class="list-row"><div class="row-copy"><strong>空间名称</strong><span>小雨和我的时光</span></div><span class="row-arrow">›</span></div>
+                <div class="list-row"><div class="row-copy"><strong>成员</strong><span>你、小雨</span></div><div class="avatar small pink">雨</div></div>
+              </div>
+              <div class="section-title"><strong>我的私人设置</strong><span>仅自己可见</span></div>
+              <div class="list" style="margin-top:0">
+                <div class="list-row"><div class="row-copy"><strong>我对TA的称呼</strong><span>小雨</span></div><span class="row-arrow">›</span></div>
+                <div class="list-row"><div class="row-copy"><strong>我与TA的关系</strong><span>朋友</span></div><span class="row-arrow">›</span></div>
+              </div>
+              <div class="section-title"><strong>共同内容</strong></div>
+              <div class="list" style="margin-top:0">
+                <div class="list-row"><div class="row-copy"><strong>纪念日提醒</strong><span>提前7天、1天</span></div><span class="row-arrow">›</span></div>
+                <div class="list-row"><div class="row-copy"><strong>导出共同内容</strong><span>生成双方可保存的文件</span></div><span class="row-arrow">›</span></div>
+              </div>
+              <div class="list" style="margin-top:20px"><div class="list-row danger-row"><div class="row-copy"><strong>解除共同空间</strong><span>私人记录不会被删除</span></div><span class="row-arrow">›</span></div></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="prototype-set" data-set="family">
+      <div class="screen-grid">
+        <article class="screen-item">
+          <div class="screen-meta"><strong>FS-01 家庭空间空状态</strong><span>先获得个人价值，再邀请家人</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>家庭空间</strong></div>
+            <div class="phone-body has-bar" style="display:flex;flex-direction:column;justify-content:center;padding-bottom:160px">
+              <div class="invite-visual"><div class="avatar large green">家</div><div class="connector" style="background:#b9d9c3"></div><div class="avatar large amber">人</div></div>
+              <div style="text-align:center"><h2>把家人的重要日子放在一起</h2><p class="subtitle" style="padding:0 26px">记录家庭成员、生日和共同回忆。家人暂时不用注册，也可以先建立档案。</p></div>
+              <div class="list" style="margin-top:24px">
+                <div class="list-row"><div class="icon-box icon-green">人</div><div class="row-copy"><strong>家庭成员档案</strong><span>老人和儿童也能记录</span></div></div>
+                <div class="list-row"><div class="icon-box icon-coral">◇</div><div class="row-copy"><strong>家庭生日提醒</strong><span>重要日子由全家共同维护</span></div></div>
+                <div class="list-row"><div class="icon-box icon-blue">▣</div><div class="row-copy"><strong>家庭共同回忆</strong><span>保存照片、故事和日期</span></div></div>
+              </div>
+            </div>
+            <div class="fixed-actions"><button class="primary" data-demo="开始创建家庭空间">创建家庭空间</button><button class="secondary">接受家庭邀请</button></div>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>FS-03 家庭首页</strong><span>家庭身份、重要日子和成员</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-body" style="padding-top:0">
+              <div class="family-band">
+                <div class="family-top"><button class="text-button space-switch" style="color:#405c48">我们的家⌄</button><button class="text-button" style="color:#405c48">设置</button></div>
+                <h2 class="family-name">我们的家</h2>
+                <p class="family-meta">5位家人 · 2位已加入与你AI</p>
+                <div class="month-feature"><div class="date-box"><strong>22</strong><span>八月</span></div><div class="event-copy"><strong>妈妈的生日</strong><span>还有8天 · 已为3人开启提醒</span></div><span class="row-arrow">›</span></div>
+              </div>
+              <div class="quick-actions">
+                <button class="quick-action"><b style="background:var(--green-soft);color:var(--green)">＋</b><span>添加家人</span></button>
+                <button class="quick-action"><b style="background:var(--coral-soft);color:var(--coral)">◇</b><span>纪念日</span></button>
+                <button class="quick-action"><b style="background:var(--blue-soft);color:var(--blue)">▣</b><span>家庭回忆</span></button>
+              </div>
+              <div class="section-title"><strong>家庭成员</strong><span>查看全部 ›</span></div>
+              <div class="member-strip">
+                <div class="member-chip"><div class="avatar green">我</div><span>我</span></div>
+                <div class="member-chip"><div class="avatar pink">妈</div><span>妈妈</span></div>
+                <div class="member-chip"><div class="avatar blue">爸</div><span>爸爸</span></div>
+                <div class="member-chip"><div class="avatar amber">外</div><span>外婆</span></div>
+                <div class="member-chip"><div class="avatar">妹</div><span>妹妹</span></div>
+              </div>
+              <div class="section-title"><strong>最近家庭回忆</strong><span>更多 ›</span></div>
+              <div class="list-row card"><div class="icon-box icon-green">照</div><div class="row-copy"><strong>今年第一次全家聚餐</strong><span>爸爸添加 · 关联5位家人</span></div><span class="row-arrow">›</span></div>
+            </div>
+            <nav class="bottom-nav"><div class="bottom-nav-item active"><b>⌂</b><span>家庭</span></div><div class="bottom-nav-item"><b>人</b><span>成员</span></div><div class="bottom-nav-item"><b>◇</b><span>日历</span></div><div class="bottom-nav-item"><b>▣</b><span>回忆</span></div></nav>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>FS-04 家庭成员</strong><span>账号成员与档案成员明确区分</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>家庭成员</strong><button class="nav-action nav-more" aria-label="添加成员">＋</button></div>
+            <div class="phone-body">
+              <div class="segmented"><button class="segment active">全部</button><button class="segment">长辈</button><button class="segment">同辈</button><button class="segment">晚辈</button></div>
+              <div class="member-group"><strong>长辈</strong><div class="member-list">
+                <div class="list-row"><div class="avatar pink">妈</div><div class="row-copy"><strong>妈妈</strong><span>创建者 · 已加入</span></div><span class="tag green">已加入</span></div>
+                <div class="list-row"><div class="avatar blue">爸</div><div class="row-copy"><strong>爸爸</strong><span>成员 · 已加入</span></div><span class="tag green">已加入</span></div>
+                <div class="list-row"><div class="avatar amber">外</div><div class="row-copy"><strong>外婆</strong><span>妈妈的妈妈 · 1948年</span></div><span class="tag gray">仅档案</span></div>
+              </div></div>
+              <div class="member-group"><strong>同辈</strong><div class="member-list">
+                <div class="list-row"><div class="avatar green">我</div><div class="row-copy"><strong>我</strong><span>成员 · 已加入</span></div><span class="tag green">已加入</span></div>
+                <div class="list-row"><div class="avatar">妹</div><div class="row-copy"><strong>妹妹</strong><span>我的妹妹 · 2001年</span></div><span class="tag gray">仅档案</span></div>
+              </div></div>
+            </div>
+            <button class="fab" aria-label="添加家庭成员" data-demo="选择添加档案或邀请家人">＋</button>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>FS-05 添加家人档案</strong><span>首轮只收集必要信息</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>添加家人档案</strong></div>
+            <div class="phone-body has-bar">
+              <span class="eyebrow">我们的家</span>
+              <h2>这位家人是谁？</h2>
+              <p class="subtitle">先记录必要信息，生日和头像以后再完善。</p>
+              <div class="field"><label>姓名或家庭称呼</label><input class="input" value="外婆" readonly></div>
+              <div class="field"><label>TA和我的关系</label><div class="select-row"><span>外婆</span><span>›</span></div></div>
+              <div class="field"><label>生日 <span>选填</span></label><div class="select-row"><span style="color:#a0a3af">选择日期</span><span>›</span></div></div>
+              <div class="field"><label>成员状态</label><div class="list" style="margin-top:0">
+                <div class="list-row"><div class="icon-box icon-green">人</div><div class="row-copy"><strong>先建立家庭档案</strong><span>不要求对方注册</span></div><span class="tag green">已选择</span></div>
+                <div class="list-row"><div class="icon-box icon-blue">↗</div><div class="row-copy"><strong>邀请TA加入</strong><span>创建后发送微信邀请</span></div><span class="row-arrow">›</span></div>
+              </div></div>
+              <div class="privacy-note" style="background:var(--green-soft);color:#4e6856"><b style="color:var(--green)">✓</b><span>档案只在“我们的家”中可见，不会公开展示。</span></div>
+            </div>
+            <div class="fixed-actions"><button class="primary" style="background:var(--green)" data-demo="已添加外婆的家庭档案">保存档案</button></div>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>FS-06 家庭日历</strong><span>按时间扫描，不强制月历视图</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>家庭日历</strong><button class="nav-action nav-more" aria-label="添加纪念日">＋</button></div>
+            <div class="phone-body">
+              <div class="segmented" style="grid-template-columns:1fr 1fr"><button class="segment active">即将到来</button><button class="segment">全部</button></div>
+              <div class="calendar-month"><strong>八月</strong><div class="calendar-line">
+                <div class="calendar-item"><span class="calendar-date">8月22日 · 还有8天</span><h3>妈妈的生日</h3><p>关联妈妈 · 每年重复 · 3人提醒</p></div>
+                <div class="calendar-item"><span class="calendar-date" style="color:var(--blue)">8月30日 · 还有16天</span><h3>全家旅行出发日</h3><p>关联5位家人 · 仅今年</p></div>
+              </div></div>
+              <div class="calendar-month"><strong>九月</strong><div class="calendar-line">
+                <div class="calendar-item"><span class="calendar-date">9月12日 · 还有29天</span><h3>爸爸妈妈结婚纪念日</h3><p>关联爸爸、妈妈 · 每年重复</p></div>
+              </div></div>
+            </div>
+            <button class="fab" aria-label="添加家庭纪念日" data-demo="添加家庭纪念日">＋</button>
+          </div>
+        </article>
+
+        <article class="screen-item">
+          <div class="screen-meta"><strong>FS-07 家庭回忆</strong><span>图片流与纯文字内容并存</span></div>
+          <div class="phone">
+            <div class="phone-status"><span>9:41</span><span>● ● ●</span></div>
+            <div class="phone-nav"><button class="nav-action" aria-label="返回">‹</button><strong>家庭回忆</strong><button class="nav-action nav-more" aria-label="更多">⋯</button></div>
+            <div class="phone-body">
+              <div class="segmented" style="grid-template-columns:1fr 1fr 1fr"><button class="segment active">全部</button><button class="segment">照片</button><button class="segment">故事</button></div>
+              <div class="memory-grid">
+                <div class="memory-tile"><div class="memory-art">夏日晚饭后</div><div class="memory-copy"><strong>全家散步</strong><span>妈妈 · 8月9日</span></div></div>
+                <div class="memory-tile"><div class="memory-art coral">团圆饭</div><div class="memory-copy"><strong>今年第一次聚齐</strong><span>爸爸 · 7月28日</span></div></div>
+                <div class="memory-tile"><div class="memory-art green">老相册</div><div class="memory-copy"><strong>外婆年轻的时候</strong><span>我 · 6月15日</span></div></div>
+                <div class="memory-tile"><div class="memory-art" style="background:#eee6f5;color:#70577e">毕业日</div><div class="memory-copy"><strong>妹妹毕业了</strong><span>妈妈 · 6月8日</span></div></div>
+              </div>
+              <div class="section-title"><strong>家庭故事</strong><span>查看全部 ›</span></div>
+              <div class="list-row card"><div class="icon-box icon-amber">文</div><div class="row-copy"><strong>爸爸第一次带我们去海边</strong><span>由爸爸记录 · 关联3位家人</span></div><span class="row-arrow">›</span></div>
+            </div>
+            <button class="fab" aria-label="添加家庭回忆" data-demo="添加照片或家庭故事">＋</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+  <script>
+    const stageContent = {
+      couple: {
+        heading: '邀请一个人，一起记录重要时刻',
+        copy: '双人空间强调接受邀请后的共同价值，同时在邀请、发布和设置页面持续说明私人内容不会被共享。'
+      },
+      family: {
+        heading: '把家人的重要日子和回忆放在一起',
+        copy: '家庭空间允许先建立未注册家人的档案，以成员、纪念日和回忆构成首版核心，不把复杂家谱作为进入门槛。'
+      }
+    };
+
+    function selectStage(stage, shouldScroll = true) {
+      document.querySelectorAll('.stage-tab').forEach((item) => item.classList.toggle('active', item.dataset.stage === stage));
+        document.querySelectorAll('.prototype-set').forEach((set) => set.classList.toggle('active', set.dataset.set === stage));
+        document.querySelector('#stage-heading').textContent = stageContent[stage].heading;
+        document.querySelector('#stage-copy').textContent = stageContent[stage].copy;
+      if (shouldScroll) {
+        history.replaceState(null, '', `#${stage}`);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    document.querySelectorAll('.stage-tab').forEach((button) => {
+      button.addEventListener('click', () => {
+        selectStage(button.dataset.stage);
+      });
+    });
+
+    selectStage(location.hash === '#family' ? 'family' : 'couple', false);
+
+    let toastTimer;
+    document.querySelectorAll('[data-demo]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const toast = document.querySelector('.toast');
+        toast.textContent = button.dataset.demo;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+      });
+    });
+  </script>
+</body>
+</html>

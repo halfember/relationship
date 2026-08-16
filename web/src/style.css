@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --td-brand-color-1: #edf4f0;
+  --td-brand-color-2: #d8e8df;
+  --td-brand-color-3: #b6d3c4;
+  --td-brand-color-4: #8cb8a3;
+  --td-brand-color-5: #659b83;
+  --td-brand-color-6: #477d67;
+  --td-brand-color-7: #315c4d;
+  --td-brand-color-8: #274b3f;
+  --td-brand-color-9: #1d392f;
+  --td-brand-color-10: #142820;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #f5f6f3;
+  color: #202522;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

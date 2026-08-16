@@ -1,0 +1,44 @@
+{
+  "pages": [
+    { "path": "pages/index/index", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/login/login", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/onboarding/index", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5", "navigationBarShadow": false } },
+    { "path": "pages/relationship/list", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/relationship/create", "style": { "navigationBarTitleText": "添加联系人", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/relationship/detail", "style": { "navigationBarTitleText": "关系详情" } },
+    { "path": "pages/contact/invite-create", "style": { "navigationBarTitleText": "邀请成为联系人" } },
+    { "path": "pages/contact/invite-accept", "style": { "navigationBarTitleText": "联系人邀请" } },
+    { "path": "pages/event/create", "style": { "navigationBarTitleText": "添加纪念日" } },
+    { "path": "pages/memory/create", "style": { "navigationBarTitleText": "添加回忆" } },
+    { "path": "pages/reminder/list", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/analytics/dashboard", "style": { "navigationBarTitleText": "数据看板" } },
+    { "path": "pages/ai/index", "style": { "navigationBarTitleText": "AI 助手" } },
+    { "path": "pages/ai/blessing", "style": { "navigationBarTitleText": "AI 祝福语生成" } },
+    { "path": "pages/ai/memory-text", "style": { "navigationBarTitleText": "AI 纪念日文案" } },
+    { "path": "pages/ai/gift", "style": { "navigationBarTitleText": "AI 送礼建议" } },
+    { "path": "pages/profile/index", "style": { "navigationBarTitleText": "我的" } },
+    { "path": "pages/space/list", "style": { "navigationBarTitleText": "共同空间" } },
+    { "path": "pages/space/invite-create", "style": { "navigationBarTitleText": "邀请一起记录" } },
+    { "path": "pages/space/invite-accept", "style": { "navigationBarTitleText": "与你AI邀请" } },
+    { "path": "pages/space/family-create", "style": { "navigationBarTitleText": "创建家庭空间" } },
+    { "path": "pages/space/detail", "style": { "navigationBarTitleText": "共同空间" } },
+    { "path": "pages/space/members", "style": { "navigationBarTitleText": "空间成员" } },
+    { "path": "pages/space/member-create", "style": { "navigationBarTitleText": "添加家人档案" } },
+    { "path": "pages/space/event-create", "style": { "navigationBarTitleText": "添加共同纪念日" } },
+    { "path": "pages/space/memory-create", "style": { "navigationBarTitleText": "添加共同回忆" } },
+    { "path": "pages/space/calendar", "style": { "navigationBarTitleText": "共同日历" } },
+    { "path": "pages/space/memories", "style": { "navigationBarTitleText": "共同回忆" } },
+    { "path": "pages/space/settings", "style": { "navigationBarTitleText": "空间设置" } },
+    { "path": "pages/export/card", "style": { "navigationBarTitleText": "关系总结卡片" } }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "与你AI",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F7F7F5"
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {}
+  }
+}

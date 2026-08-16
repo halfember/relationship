@@ -1,0 +1,47 @@
+{
+  "name": "relationship-manager-server",
+  "version": "1.4.3",
+  "description": "与你AI V1.4 - 后端服务",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "typecheck": "tsc --noEmit --incremental false",
+    "test": "npm run build && node test/event-occurrence.test.js && node test/desktop-login.test.js && node test/reminder-date.test.js && node test/reminder-dedupe.test.js && node test/reminder-delivery.test.js && node test/wechat-subscribe-message.test.js && node test/export-service.test.js && node test/analytics-period.test.js && node test/gift-suggestions.test.js && node test/space-policy.test.js && node test/space-lifecycle.test.js && node test/relationship-type.test.js && node test/relationship-birthday.test.js && node test/relationship-delete.test.js && node test/contact-service.test.js && node test/memory-file-lifecycle.test.js && node test/upload-storage.test.js && node test/voice-service.test.js && node test/runtime-guards.test.js && node test/shared-reminder.test.js && node test/user-space-invariant.test.js && node test/user-privacy-lifecycle.test.js && node test/auth.test.js",
+    "check": "npm run typecheck && npm test",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main",
+    "start:pm2": "pm2 start ecosystem.config.js",
+    "stop:pm2": "pm2 stop relationship-manager",
+    "logs:pm2": "pm2 logs relationship-manager",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:prod": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "docker:build": "docker build -t relationship-manager:v1.4.3 .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env relationship-manager:v1.4.3",
+    "health": "curl -s http://localhost:3000/api/health | python -m json.tool"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/config": "^3.1.1",
+    "@nestjs/core": "^10.3.0",
+    "@nestjs/platform-express": "^10.3.0",
+    "@nestjs/schedule": "^4.1.2",
+    "@prisma/client": "^5.9.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "multer": "^1.4.5-lts.1",
+    "reflect-metadata": "^0.1.14",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.3.0",
+    "@nestjs/schematics": "^10.1.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "@types/multer": "^1.4.11",
+    "prisma": "^5.9.0",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,27 @@
+[Unit]
+Description=Relationship Manager API
+After=network-online.target mysqld.service docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=relationship
+Group=relationship
+WorkingDirectory=/opt/relationship-manager/server
+EnvironmentFile=/opt/relationship-manager/server/.env
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+Environment=REDIS_URL=redis://127.0.0.1:6379
+Environment=UPLOAD_DIR=/opt/relationship-manager/data/uploads
+ExecStart=/usr/bin/node /opt/relationship-manager/server/dist/main.js
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/relationship-manager/data/uploads
+
+[Install]
+WantedBy=multi-user.target

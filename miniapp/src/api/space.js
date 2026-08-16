@@ -1,0 +1,25 @@
+import { get, post, put, del } from '@/utils/request.js';
+
+export const spaceApi = {
+  list() { return get('/spaces'); },
+  detail(id) { return get(`/spaces/${id}`); },
+  update(id, data) { return put(`/spaces/${id}`, data); },
+  createPairInvite(data) { return post('/spaces/pair/invites', data); },
+  createFamily(data) { return post('/spaces/families', data); },
+  invitePreview(token) { return get(`/spaces/invites/${token}`); },
+  acceptInvite(data) { return post('/spaces/invites/accept', data); },
+  createInvite(id, data = {}) { return post(`/spaces/${id}/invites`, data); },
+  revokeInvite(id, inviteId) { return del(`/spaces/${id}/invites/${inviteId}`); },
+  members(id) { return get(`/spaces/${id}/members`); },
+  addProfile(id, data) { return post(`/spaces/${id}/members/profiles`, data); },
+  updateMember(id, memberId, data) { return put(`/spaces/${id}/members/${memberId}`, data); },
+  removeMember(id, memberId) { return del(`/spaces/${id}/members/${memberId}`); },
+  events(id) { return get(`/spaces/${id}/events`); },
+  createEvent(id, data) { return post(`/spaces/${id}/events`, data); },
+  removeEvent(id, eventId) { return del(`/spaces/${id}/events/${eventId}`); },
+  memories(id) { return get(`/spaces/${id}/memories`); },
+  createMemory(id, data) { return post(`/spaces/${id}/memories`, data); },
+  removeMemory(id, memoryId) { return del(`/spaces/${id}/memories/${memoryId}`); },
+  leave(id) { return del(`/spaces/${id}/leave`); },
+  dissolve(id) { return del(`/spaces/${id}`); },
+};

@@ -1,0 +1,360 @@
+// Prisma Schema - 与你AI V1.4
+// 数据模型: 个人关系、共同空间、提醒、分享与 AI 记录
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== 用户表 ====================
+model User {
+  id        Int      @id @default(autoincrement())
+  openid    String   @unique @db.VarChar(64)
+  nickname  String?  @db.VarChar(32)
+  avatar    String?  @db.VarChar(255)
+  vipLevel  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  relationships             Relationship[]
+  createdSpaces             SharedSpace[]       @relation("SpaceCreator")
+  spaceMemberships          SpaceMember[]
+  sentSpaceInvites          SpaceInvite[]       @relation("SpaceInviteSender")
+  acceptedSpaceInvites      SpaceInvite[]       @relation("SpaceInviteAcceptor")
+  sentContactInvites        ContactInvite[]     @relation("ContactInviteSender")
+  acceptedContactInvites    ContactInvite[]     @relation("ContactInviteAcceptor")
+  contactConnectionsA       ContactConnection[] @relation("ContactConnectionUserA")
+  contactConnectionsB       ContactConnection[] @relation("ContactConnectionUserB")
+  createdContactConnections ContactConnection[] @relation("ContactConnectionCreator")
+  sharedEvents              SharedEvent[]
+  sharedMemories            SharedMemory[]
+  reminders                 Reminder[]
+  desktopLoginCodes         DesktopLoginCode[]
+  productEvents             ProductEvent[]
+
+  @@map("users")
+}
+
+model DesktopLoginCode {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String    @unique @map("code_hash") @db.Char(64)
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, expiresAt])
+  @@map("desktop_login_codes")
+}
+
+model ProductEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventName String   @map("event_name") @db.VarChar(64)
+  page      String?  @db.VarChar(128)
+  sessionId String?  @map("session_id") @db.VarChar(64)
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, eventName, createdAt])
+  @@index([createdAt])
+  @@map("product_events")
+}
+
+// ==================== 关系表 ====================
+model Relationship {
+  id            Int          @id @default(autoincrement())
+  userId        Int          @map("user_id")
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String       @db.VarChar(32)
+  type          String       @db.VarChar(16)
+  avatar        String?      @db.VarChar(255)
+  birthday      DateTime?
+  tags          Json?
+  remark        String?      @db.Text
+  sharedSpaceId Int?         @map("shared_space_id")
+  sharedSpace   SharedSpace? @relation(fields: [sharedSpaceId], references: [id], onDelete: SetNull)
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  events              Event[]
+  memories            Memory[]
+  contactInvites      ContactInvite[]
+  contactConnectionsA ContactConnection[] @relation("ContactConnectionRelationshipA")
+  contactConnectionsB ContactConnection[] @relation("ContactConnectionRelationshipB")
+
+  @@unique([userId, sharedSpaceId])
+  @@index([userId])
+  @@index([sharedSpaceId])
+  @@map("relationships")
+}
+
+// ==================== 联系人邀请与连接 ====================
+model ContactInvite {
+  id                    Int          @id @default(autoincrement())
+  inviterId             Int          @map("inviter_id")
+  inviter               User         @relation("ContactInviteSender", fields: [inviterId], references: [id], onDelete: Cascade)
+  inviterRelationshipId Int          @map("inviter_relationship_id")
+  inviterRelationship   Relationship @relation(fields: [inviterRelationshipId], references: [id], onDelete: Cascade)
+  token                 String       @unique @db.VarChar(32)
+  displayName           String       @map("display_name") @db.VarChar(32)
+  relationshipType      String       @map("relationship_type") @db.VarChar(16)
+  message               String?      @db.VarChar(160)
+  status                String       @default("PENDING") @db.VarChar(16)
+  expiresAt             DateTime     @map("expires_at")
+  acceptedById          Int?         @map("accepted_by_id")
+  acceptedBy            User?        @relation("ContactInviteAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+  acceptedAt            DateTime?    @map("accepted_at")
+  createdAt             DateTime     @default(now()) @map("created_at")
+
+  @@index([inviterId, status])
+  @@index([inviterRelationshipId])
+  @@index([token])
+  @@map("contact_invites")
+}
+
+model ContactConnection {
+  id              Int           @id @default(autoincrement())
+  userAId         Int           @map("user_a_id")
+  userA           User          @relation("ContactConnectionUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userBId         Int           @map("user_b_id")
+  userB           User          @relation("ContactConnectionUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  relationshipAId Int?          @map("relationship_a_id")
+  relationshipA   Relationship? @relation("ContactConnectionRelationshipA", fields: [relationshipAId], references: [id], onDelete: SetNull)
+  relationshipBId Int?          @map("relationship_b_id")
+  relationshipB   Relationship? @relation("ContactConnectionRelationshipB", fields: [relationshipBId], references: [id], onDelete: SetNull)
+  status          String        @default("ACTIVE") @db.VarChar(16)
+  createdById     Int           @map("created_by_id")
+  createdBy       User          @relation("ContactConnectionCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  sharedSpaceId   Int?          @map("shared_space_id")
+  sharedSpace     SharedSpace?  @relation(fields: [sharedSpaceId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  disconnectedAt  DateTime?     @map("disconnected_at")
+
+  @@unique([userAId, userBId])
+  @@index([userAId, status])
+  @@index([userBId, status])
+  @@index([sharedSpaceId])
+  @@map("contact_connections")
+}
+
+// ==================== 共同空间 ====================
+model SharedSpace {
+  id          Int      @id @default(autoincrement())
+  type        String   @db.VarChar(16)
+  status      String   @default("ACTIVE") @db.VarChar(16)
+  name        String   @db.VarChar(64)
+  avatar      String?  @db.VarChar(255)
+  createdById Int      @map("created_by_id")
+  createdBy   User     @relation("SpaceCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members               SpaceMember[]
+  invites               SpaceInvite[]
+  events                SharedEvent[]
+  memories              SharedMemory[]
+  personalRelationships Relationship[]
+  contactConnections    ContactConnection[]
+
+  @@index([createdById])
+  @@index([type, status])
+  @@map("shared_spaces")
+}
+
+model SpaceMember {
+  id            Int         @id @default(autoincrement())
+  spaceId       Int         @map("space_id")
+  space         SharedSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId        Int?        @map("user_id")
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  displayName   String      @map("display_name") @db.VarChar(32)
+  avatar        String?     @db.VarChar(255)
+  role          String      @default("MEMBER") @db.VarChar(16)
+  status        String      @default("ACTIVE") @db.VarChar(16)
+  relationLabel String?     @map("relation_label") @db.VarChar(32)
+  generation    String?     @db.VarChar(16)
+  birthday      DateTime?
+  joinedAt      DateTime?   @map("joined_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  targetInvites SpaceInvite[] @relation("InviteTargetMember")
+
+  @@unique([spaceId, userId])
+  @@index([spaceId, status])
+  @@index([userId])
+  @@map("space_members")
+}
+
+model SpaceInvite {
+  id             Int          @id @default(autoincrement())
+  spaceId        Int          @map("space_id")
+  space          SharedSpace  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  inviterId      Int          @map("inviter_id")
+  inviter        User         @relation("SpaceInviteSender", fields: [inviterId], references: [id], onDelete: Cascade)
+  acceptedById   Int?         @map("accepted_by_id")
+  acceptedBy     User?        @relation("SpaceInviteAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+  targetMemberId Int?         @map("target_member_id")
+  targetMember   SpaceMember? @relation("InviteTargetMember", fields: [targetMemberId], references: [id], onDelete: SetNull)
+  token          String       @unique @db.VarChar(32)
+  status         String       @default("PENDING") @db.VarChar(16)
+  expiresAt      DateTime     @map("expires_at")
+  acceptedAt     DateTime?    @map("accepted_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([spaceId, status])
+  @@index([inviterId])
+  @@index([token])
+  @@map("space_invites")
+}
+
+model SharedEvent {
+  id          Int         @id @default(autoincrement())
+  spaceId     Int         @map("space_id")
+  space       SharedSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  title       String      @db.VarChar(64)
+  eventDate   DateTime    @map("event_date")
+  repeatType  String?     @map("repeat_type") @db.VarChar(16)
+  remindDays  Json?       @map("remind_days")
+  createdById Int         @map("created_by_id")
+  createdBy   User        @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@index([spaceId, eventDate])
+  @@index([createdById])
+  @@map("shared_events")
+}
+
+model SharedMemory {
+  id          Int         @id @default(autoincrement())
+  spaceId     Int         @map("space_id")
+  space       SharedSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  imageUrl    String?     @map("image_url") @db.VarChar(255)
+  content     String?     @db.Text
+  memoryDate  DateTime?   @map("memory_date")
+  createdById Int         @map("created_by_id")
+  createdBy   User        @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@index([spaceId, createdAt])
+  @@index([createdById])
+  @@map("shared_memories")
+}
+
+// ==================== 事件表（纪念日/提醒） ====================
+model Event {
+  id             Int          @id @default(autoincrement())
+  relationshipId Int          @map("relationship_id")
+  relationship   Relationship @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+  title          String       @db.VarChar(64)
+  eventDate      DateTime     @map("event_date")
+  repeatType     String?      @map("repeat_type") @db.VarChar(16)
+  remindDays     Json?        @map("remind_days")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([relationshipId])
+  @@map("events")
+}
+
+// ==================== 记忆表（照片/文字回忆） ====================
+model Memory {
+  id             Int          @id @default(autoincrement())
+  relationshipId Int          @map("relationship_id")
+  relationship   Relationship @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+  imageUrl       String?      @map("image_url") @db.VarChar(255)
+  content        String?      @db.Text
+  memoryDate     DateTime?    @map("memory_date")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([relationshipId])
+  @@map("memories")
+}
+
+// ==================== 提醒表（预生成的提醒记录） ====================
+model Reminder {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @map("user_id")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceType       String    @default("RELATIONSHIP") @map("source_type") @db.VarChar(16)
+  relationshipId   Int?      @map("relationship_id")
+  eventId          Int?      @map("event_id")
+  sharedSpaceId    Int?      @map("shared_space_id")
+  sharedEventId    Int?      @map("shared_event_id")
+  eventTitle       String    @map("event_title") @db.VarChar(128)
+  relationshipName String    @map("relationship_name") @db.VarChar(64)
+  eventDate        DateTime  @map("event_date")
+  remindDate       DateTime  @map("remind_date")
+  daysUntil        Int       @map("days_until")
+  sent             Boolean   @default(false)
+  sentAt           DateTime? @map("sent_at")
+  deliveryStatus   String    @default("PENDING") @map("delivery_status") @db.VarChar(16)
+  attemptCount     Int       @default(0) @map("attempt_count")
+  lastAttemptAt    DateTime? @map("last_attempt_at")
+  nextAttemptAt    DateTime? @map("next_attempt_at")
+  failureCode      String?   @map("failure_code") @db.VarChar(32)
+  failureMessage   String?   @map("failure_message") @db.VarChar(255)
+  acknowledged     Boolean   @default(false)
+  acknowledgedAt   DateTime? @map("acknowledged_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  @@unique([userId, eventId, remindDate], map: "reminders_user_event_remind_date_key")
+  @@unique([userId, sharedEventId, remindDate], map: "reminders_user_shared_event_remind_date_key")
+  @@index([userId])
+  @@index([userId, sourceType])
+  @@index([remindDate])
+  @@index([sharedSpaceId])
+  @@index([sharedEventId])
+  @@index([deliveryStatus, remindDate, nextAttemptAt])
+  @@map("reminders")
+}
+
+// ==================== 分享邀请码表 ====================
+model ShareToken {
+  id             Int       @id @default(autoincrement())
+  userId         Int       @map("user_id")
+  relationshipId Int       @map("relationship_id")
+  token          String    @unique @db.VarChar(8)
+  expiresAt      DateTime? @map("expires_at")
+  used           Boolean   @default(false)
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@index([token])
+  @@map("share_tokens")
+}
+
+// ==================== 共享访问表 ====================
+model SharedAccess {
+  id             Int      @id @default(autoincrement())
+  ownerId        Int      @map("owner_id")
+  viewerId       Int      @map("viewer_id")
+  relationshipId Int      @map("relationship_id")
+  permission     String   @default("view") @db.VarChar(8)
+  acceptedAt     DateTime @default(now()) @map("accepted_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([ownerId, viewerId, relationshipId])
+  @@index([viewerId])
+  @@index([ownerId])
+  @@map("shared_access")
+}
+
+// ==================== AI记录表 ====================
+model AiRecord {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  type      String   @db.VarChar(32)
+  prompt    String   @db.Text
+  result    String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("ai_records")
+}
