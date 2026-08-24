@@ -83,7 +83,7 @@ const drawCard = () => {
   bgGrad.addColorStop(0, '#315c4d');
   bgGrad.addColorStop(0.3, '#315c4d');
   bgGrad.addColorStop(0.6, '#c76755');
-  bgGrad.addColorStop(1, '#F39C12');
+  bgGrad.addColorStop(1, '#d6a84f');
   ctx.setFillStyle(bgGrad);
   ctx.fillRect(0, 0, W, H);
 
@@ -124,7 +124,7 @@ const drawCard = () => {
 
   statCards.forEach((sc, i) => {
     const sx = 32 + i * 108;
-    drawRoundRect(ctx, sx, statsY, 98, 70, 12, '#F8F9FF');
+    drawRoundRect(ctx, sx, statsY, 98, 70, 12, '#f7f7f5');
     ctx.setFillStyle('#315c4d');
     ctx.setFontSize(24);
     ctx.fillText(`${sc.value}`, sx + 49, statsY + 32);
@@ -329,7 +329,7 @@ const saveToAlbum = () => {
 <style scoped>
 .card-page {
   min-height: 100vh;
-  background: #e2e5e0;
+  background: #f7f7f5;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -341,11 +341,11 @@ const saveToAlbum = () => {
   padding: 30rpx 20rpx;
   display: flex;
   justify-content: center;
-  background: #E8E8E8;
+  background: #edf0ec;
 }
 
 .export-canvas {
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.15);
   background: #fff;
 }
@@ -360,7 +360,7 @@ const saveToAlbum = () => {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  border-radius: 44rpx;
+  border-radius: 10rpx;
   font-size: 32rpx;
   font-weight: 500;
   border: none;

@@ -24,9 +24,6 @@
           :auto-height="true"
         />
         <text class="char-count">{{ form.content.length }}/500</text>
-
-        <!-- 语音输入 -->
-        <VoiceRecorder :userId="store.userId" @result="onVoiceResult" @error="onVoiceError" />
       </view>
 
       <!-- 日期 -->
@@ -53,8 +50,6 @@
 import { ref, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { memoryApi } from '@/api/memory.js';
-import VoiceRecorder from '@/components/VoiceRecorder.vue';
-import { store } from '@/store/index.js';
 import { trackEvent } from '@/utils/analytics.js';
 
 const relationshipId = ref(0);
@@ -66,7 +61,6 @@ const form = reactive({
 });
 
 const submitting = ref(false);
-const usedVoice = ref(false);
 
 onLoad((options) => {
   relationshipId.value = Number(options.relationshipId);
@@ -74,21 +68,6 @@ onLoad((options) => {
 
 const onDateChange = (e) => {
   form.memoryDate = e.detail.value;
-};
-
-// 语音识别结果回调
-const onVoiceResult = (text) => {
-  usedVoice.value = true;
-  if (form.content) {
-    form.content += '\n' + text;
-  } else {
-    form.content = text;
-  }
-  uni.showToast({ title: '已添加语音内容', icon: 'success' });
-};
-
-const onVoiceError = (err) => {
-  console.log('语音识别错误:', err);
 };
 
 const chooseImage = () => {
@@ -121,11 +100,11 @@ const handleSubmit = async () => {
       content: form.content.trim() || undefined,
       memoryDate: form.memoryDate || undefined,
     });
-    trackEvent('memory_created', { hasImage: Boolean(imageUrl), usedVoice: usedVoice.value });
+    trackEvent('memory_created', { hasImage: Boolean(imageUrl) });
     uni.showToast({ title: '添加成功', icon: 'success' });
     setTimeout(() => uni.navigateBack(), 800);
   } catch (e) {
-    // 已处理
+    uni.showToast({ title: e?.message || '保存失败，请稍后重试', icon: 'none' });
   } finally {
     submitting.value = false;
   }
@@ -145,7 +124,7 @@ const handleSubmit = async () => {
 
 .form-item {
   background: #fff;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   padding: 28rpx 24rpx;
   margin-bottom: 20rpx;
 }
@@ -161,7 +140,7 @@ const handleSubmit = async () => {
 .image-upload {
   width: 320rpx;
   height: 320rpx;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   overflow: hidden;
 }
 
@@ -175,7 +154,7 @@ const handleSubmit = async () => {
   height: 100%;
   background: #f7f7f5;
   border: 2rpx dashed #d9ddd9;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -231,7 +210,7 @@ const handleSubmit = async () => {
   line-height: 88rpx;
   background: #315c4d;
   color: #fff;
-  border-radius: 44rpx;
+  border-radius: 10rpx;
   font-size: 32rpx;
   font-weight: 500;
   border: none;

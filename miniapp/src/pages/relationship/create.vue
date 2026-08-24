@@ -65,12 +65,11 @@ const confirmDuplicate = (name) => new Promise((resolve) => uni.showModal({
   success: ({ confirm }) => resolve(confirm), fail: () => resolve(false),
 }));
 const showNextStep = (relationship) => uni.showActionSheet({
-  itemList: ['添加重要日', '记录回忆', '邀请一起记录', '暂时完成'],
+  itemList: ['添加重要日', '记录回忆', '暂时完成'],
   success: ({ tapIndex }) => {
     if (tapIndex === 0) uni.redirectTo({ url: `/pages/event/create?relationshipId=${relationship.id}` });
     if (tapIndex === 1) uni.redirectTo({ url: `/pages/memory/create?relationshipId=${relationship.id}` });
-    if (tapIndex === 2) uni.redirectTo({ url: `/pages/space/invite-create?relationshipId=${relationship.id}&name=${encodeURIComponent(relationship.name)}` });
-    if (tapIndex === 3) uni.navigateBack();
+    if (tapIndex === 2) uni.navigateBack();
   },
   fail: () => uni.navigateBack(),
 });

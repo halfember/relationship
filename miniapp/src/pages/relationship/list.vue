@@ -22,6 +22,7 @@
     <scroll-view class="filters" scroll-x :show-scrollbar="false"><view class="filter-track"><view v-for="item in filterRows" :key="item.label" :class="{active:type===item.label}" @tap="type=item.label"><text>{{item.label}}</text><text>{{item.count}}</text></view></view></scroll-view>
 
     <view v-if="loading" class="loading-list"><view v-for="item in 4" :key="item"><text></text><text></text></view></view>
+    <view v-else-if="loadError" class="empty-state"><view>!</view><text>联系人暂时加载失败</text><text>请检查网络后重试，已有联系人不会丢失。</text><button @tap="loadContacts">重新加载</button></view>
     <view v-else-if="groupedVisible.length" class="contact-groups">
       <view v-for="group in groupedVisible" :key="group.type" class="contact-group">
         <view class="group-head"><text>{{group.type}}</text><text>{{group.items.length}}</text></view>
@@ -43,7 +44,7 @@
 
 <script setup>
 import {computed,ref} from 'vue';import{onHide,onShow,onUnload}from'@dcloudio/uni-app';import BottomNav from '@/components/BottomNav.vue';import{store}from'@/store/index.js';import{relationshipApi}from'@/api/relationship.js';import{eventApi}from'@/api/event.js';import{contactApi}from'@/api/contact.js';import{openContactCreationMenu}from'@/utils/contactCreation.js';
-const list=ref([]),reminders=ref([]),todayReminders=ref([]),connections=ref([]),loading=ref(true),keyword=ref(''),type=ref('全部');const relationTypes=['家人','朋友','恋人','同事','同学','其他'];
+const list=ref([]),reminders=ref([]),todayReminders=ref([]),connections=ref([]),loading=ref(true),loadError=ref(false),keyword=ref(''),type=ref('全部');const relationTypes=['家人','朋友','恋人','同事','同学','其他'];
 const connectionMap=computed(()=>Object.fromEntries(connections.value.filter(item=>item.relationship?.id).map(item=>[item.relationship.id,item])));
 const filterRows=computed(()=>[{label:'全部',count:list.value.length},...relationTypes.map(label=>({label,count:list.value.filter(item=>item.type===label).length})).filter(item=>item.count)]);
 const visible=computed(()=>list.value.filter(item=>(type.value==='全部'||item.type===type.value)&&(!keyword.value.trim()||item.name.toLowerCase().includes(keyword.value.trim().toLowerCase()))));
@@ -51,7 +52,7 @@ const sortedVisible=computed(()=>[...visible.value].sort((a,b)=>{const nextA=nex
 const groupedVisible=computed(()=>relationTypes.map(groupType=>({type:groupType,items:sortedVisible.value.filter(item=>item.type===groupType)})).filter(group=>group.items.length));
 const attentionPeople=computed(()=>[...list.value].filter(item=>nextFor(item.id)&&eventDays(nextFor(item.id))<=30).sort((a,b)=>eventDays(nextFor(a.id))-eventDays(nextFor(b.id))).slice(0,6));
 let loadGeneration=0;const cancelPendingLoad=()=>{loadGeneration+=1;};onHide(cancelPendingLoad);onUnload(cancelPendingLoad);
-onShow(async()=>{const generation=++loadGeneration;if(!store.isLogin){uni.reLaunch({url:'/pages/login/login'});return;}loading.value=true;try{const[people,occurrences,linked]=await Promise.all([relationshipApi.list(store.userId),eventApi.upcoming(90),contactApi.list().catch(()=>[])]);if(generation!==loadGeneration)return;list.value=people||[];connections.value=linked||[];reminders.value=occurrences||[];todayReminders.value=(occurrences||[]).filter(item=>eventDays(item)===0);}finally{if(generation===loadGeneration)loading.value=false;}});
+const loadContacts=async()=>{const generation=++loadGeneration;if(!store.isLogin){uni.reLaunch({url:'/pages/login/login'});return;}loading.value=true;loadError.value=false;try{const[people,occurrences,linked]=await Promise.all([relationshipApi.list(store.userId),eventApi.upcoming(90),contactApi.list().catch(()=>[])]);if(generation!==loadGeneration)return;list.value=people||[];connections.value=linked||[];reminders.value=occurrences||[];todayReminders.value=(occurrences||[]).filter(item=>eventDays(item)===0);}catch{if(generation===loadGeneration){list.value=[];reminders.value=[];todayReminders.value=[];loadError.value=true;}}finally{if(generation===loadGeneration)loading.value=false;}};onShow(loadContacts);
 const eventDays=item=>{if(item?.daysUntilEvent!==null&&item?.daysUntilEvent!==undefined&&Number.isFinite(Number(item.daysUntilEvent)))return Math.max(0,Number(item.daysUntilEvent));const target=new Date(item?.eventDate),today=new Date();target.setHours(0,0,0,0);today.setHours(0,0,0,0);return Number.isNaN(target.getTime())?0:Math.max(0,Math.round((target-today)/86400000));};const nextFor=id=>reminders.value.find(item=>item.relationshipId===id);const dayLabel=days=>days===0?'今天':`${days}天后`;const goDetail=id=>uni.navigateTo({url:`/pages/relationship/detail?id=${id}`});
 const add=()=>openContactCreationMenu();
 </script>

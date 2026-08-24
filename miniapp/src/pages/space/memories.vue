@@ -11,7 +11,7 @@
 import { computed,ref } from 'vue';import { onLoad,onShow } from '@dcloudio/uni-app';import { spaceApi } from '@/api/space.js';
 const spaceId=ref(0);const memories=ref([]);const filter=ref('all');const tabs=[{key:'all',label:'全部'},{key:'photo',label:'照片'},{key:'text',label:'故事'}];const visible=computed(()=>filter.value==='all'?memories.value:filter.value==='photo'?memories.value.filter(i=>i.imageUrl):memories.value.filter(i=>!i.imageUrl));onLoad(o=>spaceId.value=Number(o.id));onShow(async()=>{if(spaceId.value)memories.value=await spaceApi.memories(spaceId.value)||[];});
 const formatDate=v=>{const d=new Date(v);return `${d.getMonth()+1}月${d.getDate()}日`;};const open=item=>item.imageUrl&&uni.previewImage({urls:[item.imageUrl]});const add=()=>uni.navigateTo({url:`/pages/space/memory-create?id=${spaceId.value}`});
-const remove=item=>uni.showModal({title:'删除共同回忆',content:'只有发布人或空间管理员可以删除。确认继续？',confirmColor:'#d85858',success:async r=>{if(r.confirm){await spaceApi.removeMemory(spaceId.value,item.id);memories.value=memories.value.filter(m=>m.id!==item.id);}}});
+const remove=item=>uni.showModal({title:'删除共同回忆',content:'只有发布人或空间管理员可以删除。确认继续？',confirmColor:'#c76755',success:async r=>{if(r.confirm){await spaceApi.removeMemory(spaceId.value,item.id);memories.value=memories.value.filter(m=>m.id!==item.id);}}});
 </script>
 
 <style scoped>

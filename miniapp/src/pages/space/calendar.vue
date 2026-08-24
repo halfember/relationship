@@ -16,7 +16,7 @@ import { computed,ref } from 'vue';import { onLoad,onShow } from '@dcloudio/uni-
 const spaceId=ref(0);const events=ref([]);const loading=ref(true);const mode=ref('upcoming');onLoad(o=>spaceId.value=Number(o.id));onShow(async()=>{if(!spaceId.value)return;loading.value=true;try{events.value=await spaceApi.events(spaceId.value)||[];}finally{loading.value=false;}});
 const occurrence=item=>item.nextOccurrence||item.eventDate;const filtered=computed(()=>mode.value==='all'?events.value:events.value.filter(item=>item.nextOccurrence));const groups=computed(()=>{const map={};filtered.value.forEach(item=>{const m=new Date(occurrence(item)).getMonth()+1;(map[m]||(map[m]=[])).push(item);});return Object.entries(map).map(([month,items])=>({month,items}));});
 const formatDate=v=>{const d=new Date(v);return `${d.getMonth()+1}月${d.getDate()}日`;};const countdown=v=>{const d=new Date(v);const now=new Date();d.setHours(0,0,0,0);now.setHours(0,0,0,0);const n=Math.round((d-now)/86400000);return n===0?'今天':n>0?`还有${n}天`:`已过去${Math.abs(n)}天`;};const add=()=>uni.navigateTo({url:`/pages/space/event-create?id=${spaceId.value}`});
-const remove=item=>uni.showModal({title:'删除纪念日',content:`确认删除“${item.title}”？`,confirmColor:'#d85858',success:async r=>{if(r.confirm){await spaceApi.removeEvent(spaceId.value,item.id);events.value=events.value.filter(e=>e.id!==item.id);}}});
+const remove=item=>uni.showModal({title:'删除纪念日',content:`确认删除“${item.title}”？`,confirmColor:'#c76755',success:async r=>{if(r.confirm){await spaceApi.removeEvent(spaceId.value,item.id);events.value=events.value.filter(e=>e.id!==item.id);}}});
 </script>
 
 <style scoped>

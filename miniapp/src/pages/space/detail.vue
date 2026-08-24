@@ -1,7 +1,7 @@
 <template>
-  <view v-if="space" class="space-detail" :class="{ family: space.type === 'FAMILY' }">
+  <view v-if="space" class="space-detail family">
     <view class="hero">
-      <view class="hero-top"><text class="switch-label">{{ space.type === 'FAMILY' ? '家庭空间' : '双人空间' }}</text><text class="settings" @tap="goSettings">设置</text></view>
+      <view class="hero-top"><text class="switch-label">家庭空间</text><text class="settings" @tap="goSettings">设置</text></view>
       <view class="identity">
         <view class="identity-copy"><text class="space-title">{{ space.name }}</text><text class="space-sub">{{ memberSummary }}</text></view>
         <view class="avatars"><view v-for="(member,index) in space.members.slice(0,3)" :key="member.id" :class="['avatar',`tone-${index%4}`]">{{ member.displayName.slice(0,1) }}</view></view>
@@ -10,12 +10,12 @@
     </view>
 
     <view class="actions">
-      <view @tap="goMembers"><text class="action-icon green">＋</text><text>{{ space.type === 'FAMILY' ? '添加家人' : '成员' }}</text></view>
+      <view @tap="goMembers"><text class="action-icon green">＋</text><text>添加家人</text></view>
       <view @tap="goEventCreate"><text class="action-icon coral">◇</text><text>纪念日</text></view>
       <view @tap="goMemoryCreate"><text class="action-icon blue">▣</text><text>共同回忆</text></view>
     </view>
 
-    <view class="section-row"><text class="section-heading">{{ space.type === 'FAMILY' ? '家庭成员' : '空间成员' }}</text><text @tap="goMembers">查看全部 ›</text></view>
+    <view class="section-row"><text class="section-heading">家庭成员</text><text @tap="goMembers">查看全部 ›</text></view>
     <scroll-view scroll-x class="member-scroll"><view class="member-strip"><view v-for="(member,index) in space.members" :key="member.id" class="member-chip"><view :class="['member-avatar',`tone-${index%4}`]">{{ member.displayName.slice(0,1) }}</view><text>{{ member.displayName }}</text><text>{{ member.userId ? '已加入' : '仅档案' }}</text></view></view></scroll-view>
 
     <view class="section-row"><text class="section-heading">近期纪念日</text><text @tap="goCalendar">全部 ›</text></view>
@@ -39,18 +39,18 @@ import { onLoad, onShow } from '@dcloudio/uni-app';
 import { store } from '@/store/index.js';
 import { spaceApi } from '@/api/space.js';
 const spaceId=ref(0);const space=ref(null);const error=ref('');const justCreated=ref(false);let prompted=false;
-const memberSummary=computed(()=>space.value?.type==='FAMILY'?`${space.value.members.length}位家人 · ${space.value.members.filter(item=>item.userId).length}位已加入`: `${space.value.members.length}位成员 · ${space.value._count?.events||0}个纪念日`);
+const memberSummary=computed(()=>`${space.value?.members.length || 0}位家人 · ${(space.value?.members || []).filter(item=>item.userId).length}位已加入`);
 const nextEvent=computed(()=>space.value?.events?.find(item=>item.nextOccurrence));
 onLoad(options=>{spaceId.value=Number(options.id);justCreated.value=options.created==='1';});
 onShow(()=>{if(spaceId.value)reload();});
-const reload=async()=>{try{space.value=await spaceApi.detail(spaceId.value);error.value='';if(justCreated.value&&!prompted){prompted=true;setTimeout(()=>uni.showModal({title:'家庭空间已创建',content:'先添加一位家人档案，让这个空间真正属于你们。',confirmText:'添加家人',success:r=>{if(r.confirm)goMemberCreate();}}),300);}}catch(e){error.value=e?.message||'空间加载失败';}};
+const reload=async()=>{try{const detail=await spaceApi.detail(spaceId.value);if(detail.type!=='FAMILY'){space.value=null;error.value='该空间已不再支持';return;}space.value=detail;error.value='';if(justCreated.value&&!prompted){prompted=true;setTimeout(()=>uni.showModal({title:'家庭空间已创建',content:'先添加一位家人档案，让这个空间真正属于你们。',confirmText:'添加家人',success:r=>{if(r.confirm)goMemberCreate();}}),300);}}catch(e){error.value=e?.message||'空间加载失败';}};
 const occurrence=item=>item.nextOccurrence||item.eventDate;const formatDate=value=>{const d=new Date(value);return `${d.getMonth()+1}月${d.getDate()}日`;};const day=value=>String(new Date(value).getDate()).padStart(2,'0');const month=value=>new Date(value).getMonth()+1;
 const countdown=value=>{const target=new Date(value);const now=new Date();target.setHours(0,0,0,0);now.setHours(0,0,0,0);const days=Math.round((target-now)/86400000);return days===0?'今天':days>0?`还有${days}天`:`已过去${Math.abs(days)}天`;};
 const goMembers=()=>uni.navigateTo({url:`/pages/space/members?id=${spaceId.value}&type=${space.value.type}`});const goMemberCreate=()=>uni.navigateTo({url:`/pages/space/member-create?id=${spaceId.value}`});
 const goEventCreate=()=>uni.navigateTo({url:`/pages/space/event-create?id=${spaceId.value}`});const goMemoryCreate=()=>uni.navigateTo({url:`/pages/space/memory-create?id=${spaceId.value}`});
 const goCalendar=()=>uni.navigateTo({url:`/pages/space/calendar?id=${spaceId.value}`});const goMemories=()=>uni.navigateTo({url:`/pages/space/memories?id=${spaceId.value}`});const goSettings=()=>uni.navigateTo({url:`/pages/space/settings?id=${spaceId.value}`});
 const previewMemory=memory=>memory.imageUrl&&uni.previewImage({urls:[memory.imageUrl]});
-const removeEvent=event=>uni.showModal({title:'删除纪念日',content:`确认删除“${event.title}”？`,confirmColor:'#d85858',success:async r=>{if(r.confirm){await spaceApi.removeEvent(spaceId.value,event.id);reload();}}});
+const removeEvent=event=>uni.showModal({title:'删除纪念日',content:`确认删除“${event.title}”？`,confirmColor:'#c76755',success:async r=>{if(r.confirm){await spaceApi.removeEvent(spaceId.value,event.id);reload();}}});
 </script>
 
 <style scoped>

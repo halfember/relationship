@@ -1,8 +1,11 @@
 {
   "pages": [
     { "path": "pages/index/index", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/memory/list", "style": { "navigationBarTitleText": "\u8bb0\u5f55", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/memory/detail", "style": { "navigationBarTitleText": "\u8bb0\u5f55\u8be6\u60c5", "navigationBarBackgroundColor": "#F7F7F5" } },
+    { "path": "pages/event/detail", "style": { "navigationBarTitleText": "\u91cd\u8981\u65e5\u5b50", "navigationBarBackgroundColor": "#F7F7F5" } },
     { "path": "pages/login/login", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
-    { "path": "pages/onboarding/index", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5", "navigationBarShadow": false } },
+    { "path": "pages/onboarding/index", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
     { "path": "pages/relationship/list", "style": { "navigationBarTitleText": "", "navigationBarBackgroundColor": "#F7F7F5" } },
     { "path": "pages/relationship/create", "style": { "navigationBarTitleText": "添加联系人", "navigationBarBackgroundColor": "#F7F7F5" } },
     { "path": "pages/relationship/detail", "style": { "navigationBarTitleText": "关系详情" } },
@@ -17,9 +20,7 @@
     { "path": "pages/ai/memory-text", "style": { "navigationBarTitleText": "AI 纪念日文案" } },
     { "path": "pages/ai/gift", "style": { "navigationBarTitleText": "AI 送礼建议" } },
     { "path": "pages/profile/index", "style": { "navigationBarTitleText": "我的" } },
-    { "path": "pages/space/list", "style": { "navigationBarTitleText": "共同空间" } },
-    { "path": "pages/space/invite-create", "style": { "navigationBarTitleText": "邀请一起记录" } },
-    { "path": "pages/space/invite-accept", "style": { "navigationBarTitleText": "与你AI邀请" } },
+    { "path": "pages/space/list", "style": { "navigationBarTitleText": "家庭空间" } },
     { "path": "pages/space/family-create", "style": { "navigationBarTitleText": "创建家庭空间" } },
     { "path": "pages/space/detail", "style": { "navigationBarTitleText": "共同空间" } },
     { "path": "pages/space/members", "style": { "navigationBarTitleText": "空间成员" } },

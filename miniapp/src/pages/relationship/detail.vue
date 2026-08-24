@@ -13,7 +13,6 @@
             <text class="info-type">{{ relationship.type }}</text>
           </view>
           <view class="info-actions">
-            <text class="action-share" @tap="goShare">共</text>
             <text class="action-export" @tap="goExport">卡</text>
             <text class="action-edit" @tap="goEdit">编</text>
             <text class="action-del" @tap="handleDelete">删</text>
@@ -102,9 +101,8 @@
       </view>
 
       <view v-if="connection" class="connection-section">
-        <view><text>联系人连接</text><text>{{ connection.sharedSpace ? '已关联共同空间' : `已与 ${connection.otherUser?.nickname || '对方'} 连接` }}</text></view>
-        <button v-if="connection.sharedSpace" @tap="goConnectedSpace">查看共同空间</button>
-        <button v-else class="disconnect" @tap="handleDisconnect">解除连接</button>
+        <view><text>联系人连接</text><text>已与 {{ connection.otherUser?.nickname || '对方' }} 连接</text></view>
+        <button class="disconnect" @tap="handleDisconnect">解除连接</button>
       </view>
     </block>
 
@@ -199,10 +197,6 @@ const handleDisconnect = () => {
   });
 };
 
-const goConnectedSpace = () => {
-  uni.navigateTo({ url: `/pages/space/detail?id=${connection.value.sharedSpace.id}` });
-};
-
 const handleDeleteEvent = (eventId) => {
   uni.showModal({
     title: '删除纪念日',
@@ -249,14 +243,6 @@ const goAIMemory = () => {
 
 const goAIGift = () => {
   uni.navigateTo({ url: `/pages/ai/gift?relationshipId=${relationship.value.id}` });
-};
-
-const goShare = () => {
-  uni.navigateTo({
-    url: relationship.value.sharedSpaceId
-      ? `/pages/space/detail?id=${relationship.value.sharedSpaceId}`
-      : `/pages/space/invite-create?relationshipId=${relationship.value.id}&name=${encodeURIComponent(relationship.value.name)}`,
-  });
 };
 
 const goExport = () => {

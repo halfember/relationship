@@ -1,5 +1,5 @@
 <template>
-  <view class="page">
+  <view class="page contact-accept-page">
     <view v-if="loading" class="state">正在读取联系人邀请...</view>
     <view v-else-if="error" class="state"><text class="state-title">邀请无法打开</text><text>{{ error }}</text><button @tap="goHome">返回首页</button></view>
     <block v-else>

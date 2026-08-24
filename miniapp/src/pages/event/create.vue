@@ -156,7 +156,7 @@ const handleSubmit = async () => {
     uni.showToast({ title: eventId.value ? '修改已保存' : subscribed ? '已获1次微信提醒' : '已添加，日程内提醒', icon: 'success' });
     setTimeout(() => uni.navigateBack(), 800);
   } catch (e) {
-    // 已处理
+    uni.showToast({ title: e?.message || '保存失败，请稍后重试', icon: 'none' });
   } finally {
     submitting.value = false;
   }

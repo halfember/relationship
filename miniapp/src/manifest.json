@@ -32,12 +32,7 @@
       "postcss": true,
       "minified": true
     },
-    "usingComponents": true,
-    "permission": {
-      "scope.record": {
-        "desc": "用于将语音内容转写为回忆文字"
-      }
-    }
+    "usingComponents": true
   },
   "uniStatistics": {
     "enable": false

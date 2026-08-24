@@ -24,7 +24,6 @@
     </view>
 
     <view class="auth-panel">
-      <view v-if="pendingInvite" class="invite-note"><text>邀</text><view><text>你收到一份共同记录邀请</text><text>登录后继续查看邀请详情</text></view></view>
       <text class="auth-title">开始记录重要的人</text>
       <text class="auth-subtitle">生日、纪念日和共同回忆，会安全同步到你的账号。</text>
 
@@ -52,11 +51,9 @@ import { trackEvent } from '@/utils/analytics.js';
 const loading = ref(false);
 const agreed = ref(false);
 const loginError = ref('');
-const pendingInvite = ref('');
 const pendingContactInvite = ref('');
 
 onShow(() => {
-  pendingInvite.value = uni.getStorageSync('pendingSpaceInviteToken') || '';
   pendingContactInvite.value = uni.getStorageSync('pendingContactInviteToken') || '';
   if (store.isLogin) routeAfterLogin(store.userInfo);
 });
@@ -64,7 +61,6 @@ onShow(() => {
 const routeAfterLogin = (user) => {
   if (!user?.nickname) return uni.reLaunch({ url: '/pages/onboarding/index' });
   if (pendingContactInvite.value) return uni.reLaunch({ url: `/pages/contact/invite-accept?token=${pendingContactInvite.value}` });
-  if (pendingInvite.value) return uni.reLaunch({ url: `/pages/space/invite-accept?token=${pendingInvite.value}` });
   return uni.reLaunch({ url: '/pages/index/index' });
 };
 

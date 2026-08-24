@@ -17,6 +17,11 @@ export const memoryApi = {
     return get('/memory/list', { relationshipId });
   },
 
+  /** 当前用户的全部记录 */
+  all() {
+    return get('/memory/all');
+  },
+
   /** 记忆详情 */
   detail(id) {
     return get(`/memory/${id}`);

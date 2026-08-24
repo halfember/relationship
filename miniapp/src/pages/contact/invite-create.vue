@@ -1,5 +1,5 @@
 <template>
-  <view class="page">
+  <view class="page contact-create-page">
     <view class="intro">
       <text class="eyebrow">联系人连接</text>
       <text class="title">邀请对方成为联系人</text>
@@ -18,7 +18,7 @@
         <button @tap="revoke(item)">撤回</button>
       </view>
     </view>
-    <view class="submit-bar"><button class="primary" :loading="submitting" :disabled="submitting" @tap="submit">生成联系人邀请</button><button v-if="invite" class="secondary" open-type="share">发送给微信好友</button><button v-if="invite" class="secondary" @tap="copy">复制邀请码 {{ invite.token }}</button></view>
+    <view class="submit-bar"><button class="primary" :loading="submitting" :disabled="submitting" @tap="submit">生成联系人邀请</button><button v-if="invite" class="secondary" open-type="share">发送给微信好友</button></view>
   </view>
 </template>
 
@@ -41,7 +41,6 @@ const submit = async () => {
   try { invite.value = await contactApi.createInvite({ displayName: form.displayName.trim(), relationshipType: types[typeIndex.value].value, message: form.message.trim() || undefined }); await loadPending(); } finally { submitting.value = false; }
 };
 const revoke = (item) => uni.showModal({ title: '撤回邀请', content: `撤回发给“${item.displayName}”的邀请？`, success: async ({ confirm }) => { if (!confirm) return; await contactApi.revokeInvite(item.id); if (invite.value?.id === item.id) invite.value = null; await loadPending(); uni.showToast({ title: '邀请已撤回', icon: 'success' }); } });
-const copy = () => uni.setClipboardData({ data: invite.value.token });
 onShareAppMessage(() => ({ title: `${store.userInfo?.nickname || '一位朋友'}邀请你成为联系人`, path: invite.value?.path || '/pages/index/index' }));
 </script>
 

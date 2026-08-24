@@ -17,9 +17,7 @@
     <view v-if="invite" class="invite-mask" @tap="invite=null"><view class="invite-sheet" @tap.stop>
       <text class="invite-title">邀请 {{ invite.targetMember?.displayName || '家人' }} 加入</text>
       <text class="invite-desc">发送微信邀请，对方登录后会绑定到现有家庭档案。</text>
-      <view class="token">{{ invite.token }}</view>
       <button class="primary-button" open-type="share">发送给微信好友</button>
-      <button class="copy-token" @tap="copyToken">复制邀请码</button>
     </view></view>
   </view>
 </template>
@@ -31,11 +29,10 @@ import { spaceApi } from '@/api/space.js';
 const spaceId=ref(0);const type=ref('FAMILY');const members=ref([]);const filter=ref('all');const invite=ref(null);
 const tabs=[{key:'all',label:'全部'},{key:'ELDER',label:'长辈'},{key:'PEER',label:'同辈'},{key:'YOUNGER',label:'晚辈'}];
 const grouped=computed(()=>{const source=filter.value==='all'?members.value:members.value.filter(item=>item.generation===filter.value);return [{key:'ELDER',label:'长辈',items:source.filter(i=>i.generation==='ELDER')},{key:'PEER',label:'同辈',items:source.filter(i=>!i.generation||i.generation==='PEER')},{key:'YOUNGER',label:'晚辈',items:source.filter(i=>i.generation==='YOUNGER')}];});
-onLoad(options=>{spaceId.value=Number(options.id);type.value=options.type||'FAMILY';});onShow(async()=>{if(spaceId.value)members.value=await spaceApi.members(spaceId.value)||[];});
+onLoad(options=>{spaceId.value=Number(options.id);});onShow(async()=>{if(spaceId.value)members.value=await spaceApi.members(spaceId.value)||[];});
 const roleName=role=>({OWNER:'创建者',ADMIN:'管理员',MEMBER:'成员'})[role]||'成员';const formatYear=value=>new Date(value).getFullYear();
-const add=()=>type.value==='FAMILY'?uni.showActionSheet({itemList:['添加家人档案','邀请新成员加入'],success:async({tapIndex})=>{if(tapIndex===0)uni.navigateTo({url:`/pages/space/member-create?id=${spaceId.value}`});if(tapIndex===1)invite.value=await spaceApi.createInvite(spaceId.value);}}):uni.showToast({title:'双人空间最多两位成员',icon:'none'});
-const memberAction=member=>{if(type.value==='FAMILY'&&!member.userId)uni.showModal({title:member.displayName,content:'该成员目前只有家庭档案，是否发送账号绑定邀请？',confirmText:'生成邀请',success:async r=>{if(r.confirm)invite.value=await spaceApi.createInvite(spaceId.value,{targetMemberId:member.id});}});};
-const copyToken=()=>uni.setClipboardData({data:invite.value.token});
+const add=()=>uni.showActionSheet({itemList:['添加家人档案','邀请新成员加入'],success:async({tapIndex})=>{if(tapIndex===0)uni.navigateTo({url:`/pages/space/member-create?id=${spaceId.value}`});if(tapIndex===1)invite.value=await spaceApi.createInvite(spaceId.value);}});
+const memberAction=member=>{if(!member.userId)uni.showModal({title:member.displayName,content:'该成员目前只有家庭档案，是否发送账号绑定邀请？',confirmText:'生成邀请',success:async r=>{if(r.confirm)invite.value=await spaceApi.createInvite(spaceId.value,{targetMemberId:member.id});}});};
 onShareAppMessage(()=>({title:`邀请你加入家庭空间`,path:invite.value?.path||'/pages/space/list'}));
 </script>
 

@@ -4,7 +4,6 @@ export const spaceApi = {
   list() { return get('/spaces'); },
   detail(id) { return get(`/spaces/${id}`); },
   update(id, data) { return put(`/spaces/${id}`, data); },
-  createPairInvite(data) { return post('/spaces/pair/invites', data); },
   createFamily(data) { return post('/spaces/families', data); },
   invitePreview(token) { return get(`/spaces/invites/${token}`); },
   acceptInvite(data) { return post('/spaces/invites/accept', data); },

@@ -72,11 +72,11 @@ const saveProfile = async () => {
     if (selectedAvatar.value) avatar = (await memoryApi.uploadImage(selectedAvatar.value)).url;
     const updated = await userApi.updateProfile(store.userId, { nickname: name, ...(avatar ? { avatar } : {}) });
     store.setUserInfo({ ...store.userInfo, ...updated, accessToken: store.userInfo.accessToken });
-    const pendingToken = uni.getStorageSync('pendingSpaceInviteToken');
     const pendingContactToken = uni.getStorageSync('pendingContactInviteToken');
     if (pendingContactToken) return uni.reLaunch({ url: `/pages/contact/invite-accept?token=${pendingContactToken}` });
-    if (pendingToken) return uni.reLaunch({ url: `/pages/space/invite-accept?token=${pendingToken}` });
     step.value = 2;
+  } catch (error) {
+    uni.showToast({ title: error?.message || '资料保存失败，请重试', icon: 'none' });
   } finally { saving.value = false; }
 };
 const createFirstRelationship = async () => {
@@ -87,6 +87,8 @@ const createFirstRelationship = async () => {
     if (relationship.birthday) await requestReminderSubscription();
     await relationshipApi.create({ userId: store.userId, name, type: relationship.type, birthday: relationship.birthday || undefined });
     finish();
+  } catch (error) {
+    uni.showToast({ title: error?.message || '联系人创建失败，请重试', icon: 'none' });
   } finally { creating.value = false; }
 };
 const finish = () => uni.reLaunch({ url: '/pages/index/index' });
