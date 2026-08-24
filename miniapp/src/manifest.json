@@ -26,6 +26,7 @@
   },
   "mp-weixin": {
     "appid": "wx1cd7ff1d39162fdf",
+    "lazyCodeLoading": "requiredComponents",
     "setting": {
       "urlCheck": true,
       "es6": true,
