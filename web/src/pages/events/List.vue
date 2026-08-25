@@ -18,6 +18,7 @@
     </t-card>
 
     <t-loading v-if="loading" />
+    <LoadError v-else-if="loadError" :message="loadError" @retry="loadPage" />
 
     <!-- Events Table -->
     <t-card v-else :bordered="true">
@@ -52,8 +53,10 @@
 import { ref, onMounted } from 'vue'
 import { relationshipApi, eventApi } from '@/api/api'
 import { MessagePlugin } from 'tdesign-vue-next'
+import LoadError from '@/components/LoadError.vue'
 
 const loading = ref(true)
+const loadError = ref('')
 const relationships = ref<any[]>([])
 const events = ref<any[]>([])
 const selectedRelId = ref<number | undefined>()
@@ -75,12 +78,30 @@ async function loadRelationships() {
 
 async function loadEvents() {
   loading.value = true
-  if (selectedRelId.value) {
-    events.value = await eventApi.list(selectedRelId.value)
-  } else {
-    events.value = await eventApi.all()
+  loadError.value = ''
+  try {
+    if (selectedRelId.value) {
+      events.value = await eventApi.list(selectedRelId.value)
+    } else {
+      events.value = await eventApi.all()
+    }
+  } catch (error: any) {
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取纪念日，请稍后重试。'
+  } finally {
+    loading.value = false
   }
-  loading.value = false
+}
+
+async function loadPage() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    await loadRelationships()
+    await loadEvents()
+  } catch (error: any) {
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取纪念日，请稍后重试。'
+    loading.value = false
+  }
 }
 
 async function handleDelete(id: number) {
@@ -89,8 +110,5 @@ async function handleDelete(id: number) {
   loadEvents()
 }
 
-onMounted(async () => {
-  await loadRelationships()
-  await loadEvents()
-})
+onMounted(loadPage)
 </script>

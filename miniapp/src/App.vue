@@ -28,12 +28,15 @@ page {
   --color-accent: #c76755;
   --color-gold-soft: #f1e7d4;
   --color-lilac-soft: #e9e0ed;
+  --color-coral-soft: #f7dfd6;
+  --color-subtle: #edf0ec;
   --color-border: #dedfd9;
   --radius-control: 9rpx;
   --radius-surface: 12rpx;
+  --shadow-surface: 0 8rpx 24rpx rgba(35, 43, 38, 0.04);
   min-height: 100%;
-  background: #f7f7f5;
-  color: #202522;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', sans-serif;
   font-size:var(--font-body);
   line-height:1.5;
@@ -73,24 +76,24 @@ button::after {
 }
 
 .surface {
-  background: #fff;
-  border: 1rpx solid #dedfd9;
-  border-radius: 12rpx;
-  box-shadow: 0 8rpx 24rpx rgba(35, 43, 38, 0.04);
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-border);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-surface);
 }
 
 .primary-button {
   height: 100rpx;
   line-height: 100rpx;
-  border-radius: 12rpx;
-  background: #315c4d;
+  border-radius: var(--radius-control);
+  background: var(--color-primary);
   color: #fff;
   font-size:var(--font-body);
   font-weight: 600;
 }
 
 .muted {
-  color: #7b827d;
+  color: var(--color-muted);
 }
 
 /* Shared visual contract for secondary workflows. Keep these selectors scoped
@@ -114,8 +117,8 @@ button::after {
 .contact-accept-page,
 .detail-page,
 .create-page {
-  background: #f7f7f5 !important;
-  color: #202522;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .shared-detail-page .section,
@@ -140,9 +143,9 @@ button::after {
 .contact-create-page .form-card,
 .contact-accept-page .form-card,
 .detail-page .info-card {
-  border-radius: 9rpx !important;
-  border-color: #dedfd9;
-  box-shadow: 0 8rpx 24rpx rgba(35, 43, 38, .04);
+  border-radius: var(--radius-control);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-surface);
 }
 
 .share-page .token-box,
@@ -189,7 +192,7 @@ button::after {
 .create-page .field-input,
 .create-page .field-textarea,
 .create-page .image-upload {
-  border-radius: 9rpx !important;
+  border-radius: var(--radius-control);
 }
 
 .share-page .btn-cancel,
@@ -199,7 +202,7 @@ button::after {
 .members-page .tabs,
 .memories-page .tabs,
 .calendar-page .tabs {
-  background: #edf0ec !important;
+  background: var(--color-subtle);
 }
 
 .space-list-page .space-meta,
@@ -212,13 +215,13 @@ button::after {
 .share-page .accept-desc,
 .share-page .sc-owner,
 .share-page .sc-date {
-  color: #8b918d !important;
+  color: var(--color-muted);
 }
 
 .space-list-page .pending,
 .space-detail .day-pill {
-  background: #f1e7d4 !important;
-  color: #7a612d !important;
+  background: var(--color-gold-soft);
+  color: #7a612d;
 }
 
 .space-detail .blue,
@@ -226,73 +229,69 @@ button::after {
 .members-page .tone-2,
 .memories-page .text-art,
 .memories-page .memory-card:nth-child(3n+2) .text-art {
-  background: #e9e0ed !important;
-  color: #735a7b !important;
+  background: var(--color-lilac-soft);
+  color: #735a7b;
 }
 
 .space-detail .coral,
 .members-page .tone-0,
 .space-detail .tone-0,
 .memories-page .memory-card:nth-child(3n+2) .text-art {
-  background: #f7dfd6 !important;
-  color: #915041 !important;
+  background: var(--color-coral-soft);
+  color: #915041;
 }
 
 .space-detail .green,
 .members-page .tone-3,
 .space-detail .tone-3 {
-  background: #dcebe3 !important;
-  color: #315c4d !important;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
 }
 
 .space-detail .space-nav {
-  background: rgba(255, 255, 255, .98) !important;
-  border-top-color: #e2e4df !important;
+  background: rgba(255, 255, 255, .98);
+  border-top-color: #e2e4df;
 }
 
 .space-detail .space-nav > view > text:first-child,
 .share-page .tab-item.active,
 .share-page .empty-btn,
 .share-page .bottom-btn {
-  color: #315c4d !important;
+  color: var(--color-primary);
 }
 
 .card-page {
-  background: #f7f7f5 !important;
+  background: var(--color-bg);
 }
 
 .card-page .preview-section {
-  background: #edf0ec !important;
+  background: var(--color-subtle);
 }
 
 .card-page .export-canvas,
 .card-page .action-btn {
-  border-radius: 9rpx !important;
+  border-radius: var(--radius-control);
 }
 
 .card-page .action-btn {
   box-shadow: none;
 }
 
-.create-page .submit-btn {
-  border-radius: 9rpx !important;
-}
-
 .contact-create-page .submit-bar,
 .contact-accept-page .submit-bar,
 .invite-page .submit-bar,
 .accept-page .submit-bar {
-  background: rgba(255, 255, 255, .98) !important;
-  border-top-color: #e2e4df !important;
+  background: rgba(255, 255, 255, .98);
+  border-top-color: #e2e4df;
 }
 
 .contact-create-page .primary,
 .contact-accept-page .primary,
 .invite-page .primary-button,
 .accept-page .primary-button {
-  border-radius: 9rpx !important;
-  background: #315c4d !important;
-  color: #fff !important;
+  border-radius: var(--radius-control);
+  background: var(--color-primary);
+  color: #fff;
 }
 
 /* Keep primary actions and framed controls consistent across newer workflows. */
@@ -301,20 +300,20 @@ button::after {
 .workflow-page .generate,
 .event-detail-page .edit-button,
 .event-detail-page .loading-state button {
-  border-radius: 9rpx !important;
+  border-radius: var(--radius-control);
 }
 
 .ai-page .gen-btn {
-  background: #315c4d !important;
+  background: var(--color-primary);
 }
 
 .event-detail-page {
-  background: #f7f7f5 !important;
+  background: var(--color-bg);
 }
 
 .event-detail-page .event-hero {
-  background: #315c4d !important;
-  box-shadow: 0 12rpx 26rpx rgba(49, 92, 77, .16) !important;
+  background: var(--color-primary);
+  box-shadow: 0 12rpx 26rpx rgba(49, 92, 77, .16);
 }
 
 .input-card,
@@ -324,52 +323,14 @@ button::after {
 .gift-page .ai-result,
 .workflow-page .field-card,
 .workflow-page .result-card {
-  border-radius: 9rpx !important;
+  border-radius: var(--radius-control);
 }
 
 .ai-page .preset-item,
 .workflow-page .style-pills view,
 .gift-page .gift-icon,
 .gift-page .ai-result button {
-  border-radius: 9rpx !important;
+  border-radius: var(--radius-control);
 }
 
-/* Detail pages use Chinese labels consistently; keep the compressed templates
-   backward-compatible while replacing legacy English eyebrow copy visually. */
-.memory-detail-page .eyebrow,
-.event-detail-page .eyebrow {
-  font-size: 0 !important;
-  letter-spacing: 0 !important;
-}
-
-.memory-detail-page .eyebrow::after {
-  content: '回忆';
-  font-size: 28rpx;
-  letter-spacing: 0;
-}
-
-.event-detail-page .eyebrow::after {
-  content: '重要日子';
-  font-size: 28rpx;
-  letter-spacing: 0;
-}
-
-.space-list-page .space-row,
-.members-page .member-list,
-.memories-page .memory-card,
-.settings-page .form-card,
-.settings-page .list,
-.space-detail .content-list,
-.space-detail .memory-list,
-.space-detail .next-event,
-.event-create .form-card,
-.memory-create .form-card,
-.memory-create .photo-picker,
-.memory-create .visibility,
-.event-create .visibility,
-.invite-page .code-card,
-.accept-page .relationship-form,
-.accept-page .value-card {
-  border-radius: 9rpx !important;
-}
 </style>

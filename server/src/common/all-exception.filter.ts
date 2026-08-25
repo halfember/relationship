@@ -23,6 +23,7 @@ export class AllExceptionFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = '服务器内部错误';
+    let errorCode: string | undefined;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -32,6 +33,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       } else if (typeof res === 'object' && res !== null) {
         const resObj = res as any;
         message = resObj.message || exception.message;
+        if (typeof resObj.errorCode === 'string') errorCode = resObj.errorCode;
         if (Array.isArray(message)) {
           message = message[0];
         }
@@ -62,6 +64,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       code: status,
       data: null,
       message,
+      ...(errorCode ? { errorCode } : {}),
     });
   }
 }

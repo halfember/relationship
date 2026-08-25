@@ -5,6 +5,7 @@ const { RateLimitGuard } = require('../dist/common/rate-limit.guard');
 const { ResponseInterceptor } = require('../dist/common/response.interceptor');
 const { AllExceptionFilter } = require('../dist/common/all-exception.filter');
 const { AppController } = require('../dist/app.controller');
+const { BadRequestException } = require('@nestjs/common');
 
 function rateContext(userId) {
   const handler = function protectedRoute() {};
@@ -70,4 +71,25 @@ test('production exception responses do not expose internal error messages', () 
   assert.equal(body.message, '服务器内部错误');
   if (previousEnv === undefined) delete process.env.NODE_ENV;
   else process.env.NODE_ENV = previousEnv;
+});
+
+test('exception responses preserve stable business error codes', () => {
+  let body;
+  const response = {
+    status: () => response,
+    json: (value) => { body = value; },
+  };
+  const filter = new AllExceptionFilter();
+  filter.logger = { error: () => {} };
+  filter.catch(new BadRequestException({
+    message: '请先处理共同空间',
+    errorCode: 'ACCOUNT_HAS_OWNED_SPACES',
+  }), {
+    switchToHttp: () => ({
+      getResponse: () => response,
+      getRequest: () => ({ method: 'DELETE', url: '/api/user/me/account' }),
+    }),
+  });
+  assert.equal(body.code, 400);
+  assert.equal(body.errorCode, 'ACCOUNT_HAS_OWNED_SPACES');
 });

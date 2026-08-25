@@ -13,6 +13,7 @@
     </t-card>
 
     <t-loading v-if="loading" />
+    <LoadError v-else-if="loadError" :message="loadError" @retry="loadPage" />
 
     <!-- Memory Cards -->
     <div v-else-if="memories.length" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,8 +44,10 @@ import { ref, onMounted } from 'vue'
 import { BookmarkIcon } from 'tdesign-icons-vue-next'
 import { relationshipApi, memoryApi } from '@/api/api'
 import { MessagePlugin } from 'tdesign-vue-next'
+import LoadError from '@/components/LoadError.vue'
 
 const loading = ref(true)
+const loadError = ref('')
 const relationships = ref<any[]>([])
 const memories = ref<any[]>([])
 const selectedRelId = ref<number | undefined>()
@@ -59,12 +62,30 @@ async function loadRelationships() {
 
 async function loadMemories() {
   loading.value = true
-  if (selectedRelId.value) {
-    memories.value = await memoryApi.list(selectedRelId.value)
-  } else {
-    memories.value = await memoryApi.all()
+  loadError.value = ''
+  try {
+    if (selectedRelId.value) {
+      memories.value = await memoryApi.list(selectedRelId.value)
+    } else {
+      memories.value = await memoryApi.all()
+    }
+  } catch (error: any) {
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取回忆记录，请稍后重试。'
+  } finally {
+    loading.value = false
   }
-  loading.value = false
+}
+
+async function loadPage() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    await loadRelationships()
+    await loadMemories()
+  } catch (error: any) {
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取回忆记录，请稍后重试。'
+    loading.value = false
+  }
 }
 
 async function handleDelete(id: number) {
@@ -73,8 +94,5 @@ async function handleDelete(id: number) {
   loadMemories()
 }
 
-onMounted(async () => {
-  await loadRelationships()
-  await loadMemories()
-})
+onMounted(loadPage)
 </script>

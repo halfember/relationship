@@ -215,21 +215,21 @@ export class ReminderService {
       });
       this.logger.log(`  清理 ${deletedCount.count} 条过期提醒`);
 
-      const activeMemberWhere: any = {
+      const activeMemberWhere: Prisma.SpaceMemberWhereInput = {
         status: 'ACTIVE',
         userId: userId !== undefined ? userId : { not: null },
       };
       const [events, sharedEvents] = await Promise.all([
         this.prisma.event.findMany({
           where: {
-            remindDays: { not: null as any },
+            remindDays: { not: Prisma.JsonNull },
             ...(userId !== undefined ? { relationship: { userId } } : {}),
           },
           include: { relationship: { select: { userId: true, name: true } } },
         }),
         this.prisma.sharedEvent.findMany({
           where: {
-            remindDays: { not: null as any },
+            remindDays: { not: Prisma.JsonNull },
             space: {
               status: 'ACTIVE',
               members: { some: activeMemberWhere },
@@ -253,7 +253,7 @@ export class ReminderService {
       }
 
       const windowEnd = new Date(windowStart.getTime() + 30 * 24 * 60 * 60 * 1000);
-      let createdCount = 0;
+      const reminders: Prisma.ReminderCreateManyInput[] = [];
 
       for (const event of events) {
         const nextDate = computeNextOccurrence(event.eventDate, event.repeatType);
@@ -261,7 +261,7 @@ export class ReminderService {
 
         const remindDays: number[] = (event.remindDays as number[]) || [0];
         for (const daysBefore of remindDays) {
-          createdCount += await this.createReminder({
+          const reminder = this.buildReminder({
             sourceType: 'RELATIONSHIP',
             userId: event.relationship.userId,
             relationshipId: event.relationshipId,
@@ -273,6 +273,7 @@ export class ReminderService {
             windowStart,
             windowEnd,
           });
+          if (reminder) reminders.push(reminder);
         }
       }
 
@@ -284,7 +285,7 @@ export class ReminderService {
         for (const member of event.space.members) {
           if (member.userId === null) continue;
           for (const daysBefore of remindDays) {
-            createdCount += await this.createReminder({
+            const reminder = this.buildReminder({
               sourceType: 'SPACE',
               userId: member.userId,
               sharedSpaceId: event.spaceId,
@@ -296,10 +297,14 @@ export class ReminderService {
               windowStart,
               windowEnd,
             });
+            if (reminder) reminders.push(reminder);
           }
         }
       }
 
+      const createdCount = reminders.length === 0
+        ? 0
+        : (await this.prisma.reminder.createMany({ data: reminders, skipDuplicates: true })).count;
       this.logger.log(`✅ 提醒生成完成， 新增 ${createdCount} 条`);
     } catch (err) {
       this.logger.error('提醒生成失败:', err);
@@ -307,7 +312,7 @@ export class ReminderService {
     }
   }
 
-  private async createReminder(input: {
+  private buildReminder(input: {
     sourceType: 'RELATIONSHIP' | 'SPACE';
     userId: number;
     relationshipId?: number;
@@ -320,44 +325,23 @@ export class ReminderService {
     daysBefore: number;
     windowStart: Date;
     windowEnd: Date;
-  }): Promise<number> {
+  }): Prisma.ReminderCreateManyInput | null {
     const remindDate = new Date(input.eventDate.getTime() - input.daysBefore * 24 * 60 * 60 * 1000);
-    if (remindDate < input.windowStart || remindDate > input.windowEnd) return 0;
+    if (remindDate < input.windowStart || remindDate > input.windowEnd) return null;
 
-    const existing = await this.prisma.reminder.findFirst({
-      where: {
-        userId: input.userId,
-        sourceType: input.sourceType,
-        relationshipId: input.relationshipId,
-        eventId: input.eventId,
-        sharedSpaceId: input.sharedSpaceId,
-        sharedEventId: input.sharedEventId,
-        remindDate,
-      },
-    });
-    if (existing) return 0;
-
-    try {
-      await this.prisma.reminder.create({
-        data: {
-          userId: input.userId,
-          sourceType: input.sourceType,
-          relationshipId: input.relationshipId,
-          eventId: input.eventId,
-          sharedSpaceId: input.sharedSpaceId,
-          sharedEventId: input.sharedEventId,
-          eventTitle: input.eventTitle,
-          relationshipName: input.relationshipName,
-          eventDate: input.eventDate,
-          remindDate,
-          daysUntil: input.daysBefore,
-        },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') return 0;
-      throw error;
-    }
-    return 1;
+    return {
+      userId: input.userId,
+      sourceType: input.sourceType,
+      relationshipId: input.relationshipId,
+      eventId: input.eventId,
+      sharedSpaceId: input.sharedSpaceId,
+      sharedEventId: input.sharedEventId,
+      eventTitle: input.eventTitle,
+      relationshipName: input.relationshipName,
+      eventDate: input.eventDate,
+      remindDate,
+      daysUntil: input.daysBefore,
+    };
   }
 
   private reminderPage(reminder: any) {

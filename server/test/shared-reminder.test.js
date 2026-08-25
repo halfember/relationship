@@ -4,6 +4,7 @@ const { ReminderService } = require('../dist/reminder/reminder.service');
 
 test('shared events create one reminder per active account member', async () => {
   const created = [];
+  const insertCalls = [];
   const eventDate = new Date();
   eventDate.setHours(0, 0, 0, 0);
   eventDate.setDate(eventDate.getDate() + 5);
@@ -11,8 +12,11 @@ test('shared events create one reminder per active account member', async () => 
   const prisma = {
     reminder: {
       deleteMany: async () => ({ count: 0 }),
-      findFirst: async () => null,
-      create: async ({ data }) => { created.push(data); return data; },
+      createMany: async (input) => {
+        insertCalls.push(input);
+        created.push(...input.data);
+        return { count: input.data.length };
+      },
     },
     event: { findMany: async () => [] },
     sharedEvent: {
@@ -30,6 +34,8 @@ test('shared events create one reminder per active account member', async () => 
 
   await new ReminderService(prisma).generateUpcoming();
 
+  assert.equal(insertCalls.length, 1);
+  assert.equal(insertCalls[0].skipDuplicates, true);
   assert.equal(created.length, 4);
   assert.deepEqual(new Set(created.map((item) => item.userId)), new Set([11, 12]));
   assert.ok(created.every((item) => item.sourceType === 'SPACE'));

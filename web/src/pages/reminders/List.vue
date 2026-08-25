@@ -4,16 +4,17 @@
       <h3 class="text-lg font-semibold text-gray-800">提醒列表</h3>
       <div class="flex items-center gap-3">
         <span class="text-sm text-gray-500">未来</span>
-        <t-input-number v-model="days" :min="1" :max="90" style="width: 80px" @change="loadData" />
+        <t-input-number v-model="days" :min="1" :max="90" style="width: 80px" @change="loadPage" />
         <span class="text-sm text-gray-500">天</span>
-        <t-button size="small" variant="outline" @click="loadToday">今日提醒</t-button>
+        <t-button size="small" variant="outline" @click="loadPage">今日提醒</t-button>
       </div>
     </div>
 
     <t-loading v-if="loading" />
+    <LoadError v-else-if="loadError" :message="loadError" @retry="loadPage" />
 
     <!-- Today's Reminders -->
-    <t-card v-if="todayReminders.length" :bordered="true" title="今日提醒" class="border-l-4 border-l-orange-400">
+    <t-card v-if="!loadError && todayReminders.length" :bordered="true" title="今日提醒" class="border-l-4 border-l-orange-400">
       <div v-for="r in todayReminders" :key="r.id" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
         <div>
           <span class="font-medium">{{ r.eventTitle }}</span>
@@ -24,7 +25,7 @@
     </t-card>
 
     <!-- Upcoming -->
-    <t-card :bordered="true" :title="`未来 ${days} 天内的提醒`">
+    <t-card v-if="!loadError" :bordered="true" :title="`未来 ${days} 天内的提醒`">
       <t-table
         v-if="upcoming.length"
         :data="upcoming"
@@ -63,8 +64,10 @@
 import { ref, onMounted } from 'vue'
 import { reminderApi } from '@/api/api'
 import { MessagePlugin } from 'tdesign-vue-next'
+import LoadError from '@/components/LoadError.vue'
 
 const loading = ref(true)
+const loadError = ref('')
 const days = ref(30)
 const upcoming = ref<any[]>([])
 const todayReminders = ref<any[]>([])
@@ -81,24 +84,32 @@ const columns = [
 const deliveryLabel = (status: string) => ({ PENDING:'待发送', SENDING:'发送中', RETRY:'重试中', SENT:'已送达', NO_PERMISSION:'未授权', FAILED:'发送失败' }[status] || status || '待发送')
 const deliveryTheme = (status: string) => status === 'SENT' ? 'success' : status === 'FAILED' ? 'danger' : status === 'NO_PERMISSION' ? 'warning' : 'default'
 
-async function loadData() {
-  loading.value = true
-  upcoming.value = await reminderApi.upcoming(undefined, days.value)
-  loading.value = false
+function errorMessage(error: any) {
+  return error?.response?.data?.message || error?.message || '暂时无法读取提醒，请稍后重试。'
 }
 
-async function loadToday() {
-  todayReminders.value = await reminderApi.today()
+async function loadPage() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const [nextUpcoming, nextToday] = await Promise.all([
+      reminderApi.upcoming(undefined, days.value),
+      reminderApi.today(),
+    ])
+    upcoming.value = nextUpcoming
+    todayReminders.value = nextToday
+  } catch (error: any) {
+    loadError.value = errorMessage(error)
+  } finally {
+    loading.value = false
+  }
 }
 
 async function handleAcknowledge(id: number) {
   await reminderApi.acknowledge(id)
   MessagePlugin.success('已标记处理')
-  loadData()
+  loadPage()
 }
 
-onMounted(() => {
-  loadData()
-  loadToday()
-})
+onMounted(loadPage)
 </script>

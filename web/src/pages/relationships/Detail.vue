@@ -7,6 +7,7 @@
     </t-link>
 
     <t-loading v-if="loading" />
+    <LoadError v-else-if="loadError" :message="loadError" @retry="loadDetail" />
 
     <template v-else-if="detail">
       <!-- Basic Info -->
@@ -148,12 +149,14 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeftIcon, AddIcon } from 'tdesign-icons-vue-next'
+import LoadError from '@/components/LoadError.vue'
 import { relationshipApi, eventApi, memoryApi } from '@/api/api'
 import { MessagePlugin } from 'tdesign-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
+const loadError = ref('')
 const detail = ref<any>(null)
 const showEventAdd = ref(false)
 const showMemoryAdd = ref(false)
@@ -182,8 +185,15 @@ function daysSince(date: string) {
 
 async function loadDetail() {
   loading.value = true
-  detail.value = await relationshipApi.detail(Number(route.params.id))
-  loading.value = false
+  loadError.value = ''
+  try {
+    detail.value = await relationshipApi.detail(Number(route.params.id))
+  } catch (error: any) {
+    detail.value = null
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取关系详情，请稍后重试。'
+  } finally {
+    loading.value = false
+  }
 }
 
 async function handleEventSubmit() {

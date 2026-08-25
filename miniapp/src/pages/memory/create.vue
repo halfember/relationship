@@ -210,7 +210,7 @@ const handleSubmit = async () => {
   line-height: 88rpx;
   background: #315c4d;
   color: #fff;
-  border-radius: 10rpx;
+  border-radius: var(--radius-control);
   font-size: 32rpx;
   font-weight: 500;
   border: none;

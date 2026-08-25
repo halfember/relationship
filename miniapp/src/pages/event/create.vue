@@ -274,5 +274,5 @@ const handleSubmit = async () => {
 .form-input,.form-picker { padding:0;background:transparent;border-radius:0; }
 .repeat-opt,.remind-opt { min-height:72rpx;display:flex;align-items:center;border:1rpx solid #d9ddd8;border-radius:8rpx;background:#fff; }
 .submit-section { position:fixed;z-index:10;left:0;right:0;bottom:0;padding:15rpx 28rpx calc(15rpx + env(safe-area-inset-bottom));border-top:1rpx solid #e0e3de;background:rgba(255,255,255,.98); }
-.submit-btn { height:100rpx;border-radius:10rpx;line-height:100rpx;background:#315c4d;font-weight:650; }
+.submit-btn { height:100rpx;border-radius:var(--radius-control);line-height:100rpx;background:#315c4d;font-weight:650; }
 </style>

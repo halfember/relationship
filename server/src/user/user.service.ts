@@ -122,7 +122,12 @@ export class UserService {
     const ownedSpaces = await this.prisma.sharedSpace.count({
       where: { createdById: userId, status: { in: ['ACTIVE', 'PENDING'] } },
     });
-    if (ownedSpaces > 0) throw new BadRequestException('请先解散或转让你创建的共同空间');
+    if (ownedSpaces > 0) {
+      throw new BadRequestException({
+        message: '请先解散你创建的共同空间，再注销账号',
+        errorCode: 'ACCOUNT_HAS_OWNED_SPACES',
+      });
+    }
     const activePairMemberships = await this.prisma.spaceMember.count({
       where: {
         userId,
@@ -130,7 +135,12 @@ export class UserService {
         space: { type: 'PAIR', status: { in: ['ACTIVE', 'PENDING'] } },
       },
     });
-    if (activePairMemberships > 0) throw new BadRequestException('请先退出双人共同空间再注销账号');
+    if (activePairMemberships > 0) {
+      throw new BadRequestException({
+        message: '请先退出双人共同空间，再注销账号',
+        errorCode: 'ACCOUNT_HAS_ACTIVE_PAIR_SPACE',
+      });
+    }
     const [authoredSharedEvents, archivedOwnedSpaces, relationships, authoredSharedMemories] = await Promise.all([
       this.prisma.sharedEvent.findMany({ where: { createdById: userId }, select: { id: true } }),
       this.prisma.sharedSpace.findMany({

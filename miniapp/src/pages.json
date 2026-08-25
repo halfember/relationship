@@ -32,6 +32,7 @@
     { "path": "pages/space/settings", "style": { "navigationBarTitleText": "空间设置" } },
     { "path": "pages/export/card", "style": { "navigationBarTitleText": "关系总结卡片" } }
   ],
+  "subPackages": [],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "与你AI",

@@ -12,6 +12,7 @@
     <!-- Table -->
     <t-card :bordered="true">
       <t-loading v-if="loading" />
+      <LoadError v-else-if="loadError" :message="loadError" @retry="loadList" />
       <t-table
         v-else
         :data="list"
@@ -46,7 +47,7 @@
           </t-space>
         </template>
       </t-table>
-      <t-empty v-if="!loading && list.length === 0" description="暂无关系，请添加" />
+      <t-empty v-if="!loading && !loadError && list.length === 0" description="暂无关系，请添加" />
     </t-card>
 
     <!-- Create/Edit Dialog -->
@@ -91,11 +92,13 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { AddIcon } from 'tdesign-icons-vue-next'
+import LoadError from '@/components/LoadError.vue'
 import { relationshipApi } from '@/api/api'
 import { MessagePlugin } from 'tdesign-vue-next'
 
 const router = useRouter()
 const loading = ref(true)
+const loadError = ref('')
 const list = ref<any[]>([])
 const showCreate = ref(false)
 const editingId = ref(0)
@@ -140,8 +143,14 @@ function editRow(row: any) {
 
 async function loadList() {
   loading.value = true
-  list.value = await relationshipApi.list()
-  loading.value = false
+  loadError.value = ''
+  try {
+    list.value = await relationshipApi.list()
+  } catch (error: any) {
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取关系列表，请稍后重试。'
+  } finally {
+    loading.value = false
+  }
 }
 
 function goDetail(id: number) {

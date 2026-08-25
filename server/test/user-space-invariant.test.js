@@ -13,7 +13,22 @@ test('an active pair member must leave before deleting the account', async () =>
 
   await assert.rejects(
     () => new UserService(prisma).deleteAccount(7),
-    (error) => error?.message === '请先退出双人共同空间再注销账号',
+    (error) => error?.getResponse?.().errorCode === 'ACCOUNT_HAS_ACTIVE_PAIR_SPACE',
   );
   assert.equal(transactionCalled, false);
+});
+
+test('an owner must dissolve active spaces before deleting the account', async () => {
+  let membershipChecked = false;
+  const prisma = {
+    user: { findUnique: async () => ({ id: 7 }) },
+    sharedSpace: { count: async () => 1 },
+    spaceMember: { count: async () => { membershipChecked = true; return 0; } },
+  };
+
+  await assert.rejects(
+    () => new UserService(prisma).deleteAccount(7),
+    (error) => error?.getResponse?.().errorCode === 'ACCOUNT_HAS_OWNED_SPACES',
+  );
+  assert.equal(membershipChecked, false);
 });

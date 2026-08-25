@@ -4,6 +4,7 @@
 
     <!-- Loading -->
     <t-loading v-if="loading" text="加载中..." />
+    <LoadError v-else-if="loadError" :message="loadError" @retry="loadDashboard" />
 
     <!-- Stat Cards -->
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -57,7 +58,7 @@
     </div>
 
     <!-- Charts Row -->
-    <div v-if="!loading" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div v-if="!loading && !loadError" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <!-- Relationship Distribution -->
       <t-card :bordered="true" title="关系分布">
         <div class="h-72">
@@ -76,7 +77,7 @@
     </div>
 
     <!-- Relationship List -->
-    <t-card v-if="!loading" :bordered="true" title="关系列表">
+    <t-card v-if="!loading && !loadError" :bordered="true" title="关系列表">
       <t-table
         :data="stats.topRelationships"
         :columns="tableColumns"
@@ -108,10 +109,12 @@ import { useRouter } from 'vue-router'
 import { UsergroupIcon, CalendarIcon, BookmarkIcon, NotificationIcon } from 'tdesign-icons-vue-next'
 import type { EChartsCoreOption } from 'echarts/core'
 import EChart from '@/components/EChart.vue'
+import LoadError from '@/components/LoadError.vue'
 import { analyticsApi, type DashboardData } from '@/api/api'
 
 const router = useRouter()
 const loading = ref(true)
+const loadError = ref('')
 const stats = ref<DashboardData>({
   overview: { totalRelationships: 0, totalEvents: 0, totalMemories: 0, totalAiRecords: 0, totalReminders: 0, monthPendingReminders: 0 },
   weeklyReminderTrend: [],
@@ -167,9 +170,17 @@ function goDetail(id: number) {
   router.push(`/relationships/${id}`)
 }
 
-onMounted(async () => {
-  const data = await analyticsApi.dashboard()
-  stats.value = data
-  loading.value = false
-})
+async function loadDashboard() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    stats.value = await analyticsApi.dashboard()
+  } catch (error: any) {
+    loadError.value = error?.response?.data?.message || error?.message || '暂时无法读取数据概览，请稍后重试。'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadDashboard)
 </script>
