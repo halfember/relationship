@@ -68,7 +68,7 @@ onShow(async()=>{ if(!store.isLogin) return uni.reLaunch({url:'/pages/login/logi
 <style scoped>
 .analytics-page { min-height:100vh; padding:24rpx 28rpx 48rpx; background:#f7f7f5; }
 .loading { padding:100rpx 0; text-align:center; color:#8b918d; }
-.overview-card { padding:28rpx; border-radius:12rpx; color:#fff; background:#315c4d; box-shadow:0 8rpx 24rpx rgba(35,43,38,.06); }
+.overview-card { padding:28rpx; border-radius:12rpx; color:#fff; background:#315c4d;  }
 .overview-title { font-size:32rpx; opacity:.88; }
 .overview-values { display:flex; align-items:center; justify-content:space-around; margin-top:18rpx; }
 .overview-values>view:not(.divider) { width:42%; display:flex; flex-direction:column; align-items:center; font-size:26rpx; opacity:.9; }

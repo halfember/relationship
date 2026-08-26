@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "nest build",
+    "test:safety": "npm run build && node test/content-safety.test.js",
     "typecheck": "tsc --noEmit --incremental false",
     "test": "npm run build && node test/event-occurrence.test.js && node test/desktop-login.test.js && node test/reminder-date.test.js && node test/reminder-dedupe.test.js && node test/reminder-delivery.test.js && node test/wechat-subscribe-message.test.js && node test/export-service.test.js && node test/analytics-period.test.js && node test/gift-suggestions.test.js && node test/space-policy.test.js && node test/space-lifecycle.test.js && node test/relationship-type.test.js && node test/relationship-birthday.test.js && node test/relationship-delete.test.js && node test/contact-service.test.js && node test/memory-file-lifecycle.test.js && node test/upload-storage.test.js && node test/voice-service.test.js && node test/runtime-guards.test.js && node test/shared-reminder.test.js && node test/user-space-invariant.test.js && node test/user-privacy-lifecycle.test.js && node test/auth.test.js",
     "check": "npm run typecheck && npm test",

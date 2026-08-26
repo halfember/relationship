@@ -286,7 +286,7 @@ onLoad((options) => {
   padding: 48rpx 40rpx;
   width: 600rpx;
   text-align: center;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+
 }
 
 .modal-icon {
@@ -378,7 +378,7 @@ onLoad((options) => {
   padding: 48rpx 40rpx;
   width: 600rpx;
   text-align: center;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+
 }
 
 .accept-icon {
@@ -476,7 +476,7 @@ onLoad((options) => {
   background: #fff;
   border-radius: 16rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+
 }
 
 .sc-left {

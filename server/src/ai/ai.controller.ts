@@ -14,10 +14,11 @@ import { GenerateDto } from './dto/generate.dto';
 import { CurrentUserId } from '../auth/current-user.decorator';
 import { parseGiftSuggestions } from './gift-suggestions';
 import { RateLimit } from '../common/rate-limit.decorator';
+import { ContentSafetyService } from '../content-safety/content-safety.service';
 
 @Controller('ai')
 export class AiController {
-  constructor(private readonly aiService: AiService) {}
+  constructor(private readonly aiService: AiService, private readonly contentSafety: ContentSafetyService) {}
 
   /**
    * POST /api/ai/generate
@@ -47,6 +48,7 @@ export class AiController {
       gift: { temperature: 0.2, maxTokens: 420 },
     }[dto.type];
     const result = await this.aiService.chat(systemPrompt, userMessage, generationOptions);
+    this.contentSafety.assertTextAllowed(result, 'AI 生成内容');
 
     const giftData = dto.type === 'gift'
       ? parseGiftSuggestions(result, { min: dto.budgetMin!, max: dto.budgetMax! })

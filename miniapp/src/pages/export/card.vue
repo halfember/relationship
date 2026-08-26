@@ -346,7 +346,7 @@ const saveToAlbum = () => {
 
 .export-canvas {
   border-radius: 12rpx;
-  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.15);
+
   background: #fff;
 }
 

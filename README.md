@@ -43,7 +43,7 @@ Copy-Item miniapp/.env.example miniapp/.env.local
 ### 2. 启动数据库
 
 ```powershell
-docker compose up -d mysql redis
+docker compose -f docker-compose.dev.yml up -d
 ```
 
 首次启动或 schema 发生变化时：

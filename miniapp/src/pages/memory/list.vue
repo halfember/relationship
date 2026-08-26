@@ -88,7 +88,7 @@ const createMemory = () => {
 .view-toggle { width: 68rpx; height: 68rpx; margin: 0 0 0 12rpx; padding: 0; flex: none; border: 1rpx solid #dfe2dd; border-radius: 8rpx; background: #fff; color: #52605a; line-height: 64rpx; font-size: 34rpx; }
 
 .records-grid { margin-top: 22rpx; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16rpx; }
-.memory-tile { min-width: 0; overflow: hidden; border: 1rpx solid #dedfd9; border-radius: 10rpx; background: #fff; box-shadow: 0 8rpx 24rpx rgba(35, 43, 38, .04); }
+.memory-tile { min-width: 0; overflow: hidden; border: 1rpx solid #dedfd9; border-radius: 10rpx; background: #fff;  }
 .memory-image,
 .memory-art { width: 100%; height: 220rpx; }
 .memory-image { display: block; background: #e9ece8; }
@@ -101,7 +101,7 @@ const createMemory = () => {
 .memory-meta { margin-top: 5rpx; overflow: hidden; color: #8b918d; font-size: 25rpx; line-height: 34rpx; text-overflow: ellipsis; white-space: nowrap; }
 
 .list-view { grid-template-columns: 1fr; gap: 0; border-top: 1rpx solid #dfe2dd; border-bottom: 1rpx solid #dfe2dd; }
-.list-view .memory-tile { min-height: 144rpx; display: flex; align-items: stretch; border: 0; border-bottom: 1rpx solid #e5e7e2; border-radius: 0; box-shadow: none; }
+.list-view .memory-tile { min-height: 144rpx; display: flex; align-items: stretch; border: 0; border-bottom: 1rpx solid #e5e7e2; border-radius: 0;  }
 .list-view .memory-tile:last-child { border-bottom: 0; }
 .list-view .memory-image,
 .list-view .memory-art { width: 144rpx; height: 144rpx; flex: none; }

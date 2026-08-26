@@ -18,6 +18,7 @@ import { ExportModule } from './export/export.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { SpaceModule } from './space/space.module';
+import { ContentSafetyModule } from './content-safety/content-safety.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { SpaceModule } from './space/space.module';
     ExportModule,
     UploadModule,
     SpaceModule,
+    ContentSafetyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

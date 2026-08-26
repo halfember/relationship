@@ -33,7 +33,6 @@ page {
   --color-border: #dedfd9;
   --radius-control: 9rpx;
   --radius-surface: 12rpx;
-  --shadow-surface: 0 8rpx 24rpx rgba(35, 43, 38, 0.04);
   min-height: 100%;
   background: var(--color-bg);
   color: var(--color-text);
@@ -79,7 +78,7 @@ button::after {
   background: var(--color-surface);
   border: 1rpx solid var(--color-border);
   border-radius: var(--radius-surface);
-  box-shadow: var(--shadow-surface);
+
 }
 
 .primary-button {
@@ -145,7 +144,7 @@ button::after {
 .detail-page .info-card {
   border-radius: var(--radius-control);
   border-color: var(--color-border);
-  box-shadow: var(--shadow-surface);
+
 }
 
 .share-page .token-box,
@@ -274,7 +273,7 @@ button::after {
 }
 
 .card-page .action-btn {
-  box-shadow: none;
+
 }
 
 .contact-create-page .submit-bar,
@@ -313,7 +312,7 @@ button::after {
 
 .event-detail-page .event-hero {
   background: var(--color-primary);
-  box-shadow: 0 12rpx 26rpx rgba(49, 92, 77, .16);
+
 }
 
 .input-card,

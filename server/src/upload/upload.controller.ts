@@ -12,9 +12,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { memoryStorage } from 'multer';
-import { Public } from '../auth/public.decorator';
 import { IMAGE_TYPES, UploadStorageService } from './upload-storage';
 import { RateLimit } from '../common/rate-limit.decorator';
+import { Public } from '../auth/public.decorator';
 
 @Controller('upload')
 export class UploadController {
