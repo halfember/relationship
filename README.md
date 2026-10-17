@@ -9,7 +9,7 @@
 | API | Node.js 20、NestJS 10、Prisma 5、MySQL 8 |
 | 小程序 | uni-app、Vue 3、微信小程序 |
 | Web | Vue 3、Vite、TypeScript、TDesign、ECharts |
-| 基础设施 | Docker Compose、MySQL；Redis 服务已预留，当前业务代码未直接使用 |
+| 基础设施 | 共享 MySQL、Docker Compose Redis；Redis 服务已预留，当前业务代码未直接使用 |
 | AI | OpenAI 兼容 Chat Completions / Whisper 接口；未配置或上游失败时返回明确错误，不生成模拟内容 |
 
 ## 目录
@@ -27,7 +27,7 @@ docker-compose.yml
 ### 1. 准备环境
 
 - Node.js 20+
-- Docker Desktop（推荐）或本机 MySQL 8
+- 可访问的共享 MySQL 8 实例；运行本地 Redis 时需要 Docker Desktop
 - 微信开发者工具（调试小程序时）
 
 复制环境模板并填写实际配置：
@@ -40,7 +40,9 @@ Copy-Item miniapp/.env.example miniapp/.env.local
 
 `server/.env` 中的微信 Secret 和 AI Key 只应保存在本机或部署平台密钥管理中，不要提交到仓库。
 
-### 2. 启动数据库
+### 2. 准备数据库和 Redis
+
+在共享 MySQL 实例中创建独立的 `relationship` 数据库和专用账号，并在 `server/.env` 配置该账号的 `DATABASE_URL`。SQL 示例见[本地开发文档](docs/DEVELOPMENT.md)。开发 Compose 只启动 Redis：
 
 ```powershell
 docker compose -f docker-compose.dev.yml up -d
@@ -87,15 +89,9 @@ npm run dev:mp-weixin
 
 在微信开发者工具打开 `miniapp/dist/dev/mp-weixin`。真机调试时，把 `miniapp/.env.local` 的 `VITE_API_BASE_URL` 改成开发机局域网 IP，并在微信开发者工具中关闭域名校验或配置 HTTPS 合法域名。
 
-## Docker 部署
+## 生产部署
 
-先复制根目录 `.env.example` 为 `.env`，设置 MySQL 密码，再复制并填写 `server/.env`。启动全部服务：
-
-```powershell
-docker compose up -d --build
-```
-
-后端容器启动时会自动执行 `prisma migrate deploy`，迁移失败时不会启动 API。生产环境请使用 HTTPS、限制 `CORS_ORIGIN`，并将微信和 AI 密钥放到部署平台的 Secret 中。详细说明见 [部署文档](docs/DEPLOYMENT.md)。
+生产环境同样使用独立的 `relationship` 数据库和专用账号，可与其他项目共用 MySQL 实例。当前部署方案由 systemd 运行 API，Docker Compose 只运行 Redis 和 Caddy；数据库创建、迁移和服务启动步骤见[部署文档](docs/DEPLOYMENT.md)。生产环境请使用 HTTPS、限制 `CORS_ORIGIN`，并将微信和 AI 密钥放到部署平台的 Secret 中。
 
 ## 功能模块
 

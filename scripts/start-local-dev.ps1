@@ -13,7 +13,7 @@ $composeStarted = $false
 foreach ($attempt in 1..3) {
     Push-Location $repoRoot
     try {
-        docker compose -f docker-compose.dev.yml up -d --wait
+        docker compose -f docker-compose.dev.yml up -d --wait --remove-orphans
     }
     finally {
         Pop-Location
@@ -30,7 +30,7 @@ foreach ($attempt in 1..3) {
 }
 
 if (-not $composeStarted) {
-    throw 'Failed to start local MySQL and Redis containers. Check that Docker Desktop is running.'
+    throw 'Failed to start local Redis. Check that Docker Desktop is running.'
 }
 
 if (-not $SkipInstall) {

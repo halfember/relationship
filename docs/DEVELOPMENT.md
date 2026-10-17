@@ -1,18 +1,26 @@
 # Local development
 
-The local development setup runs MySQL and Redis in Docker. The NestJS API,
+The local development setup uses a shared MySQL instance and runs Redis in Docker. The NestJS API,
 Vue web client, and mini program build run on the host so file watching and
 debuggers work normally.
 
 ## Prerequisites
 
-- Docker Desktop
+- Docker Desktop for Redis and a reachable shared MySQL 8 instance
 - Node.js 20 or newer
 - WeChat Developer Tools when debugging the mini program
 
 ## First-time setup
 
-Start the infrastructure services from the repository root:
+Create a separate `relationship` database and a user with access only to that database on the shared MySQL instance:
+
+```sql
+CREATE DATABASE IF NOT EXISTS relationship CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'relationship_app'@'%' IDENTIFIED BY '<local-password>';
+GRANT ALL PRIVILEGES ON relationship.* TO 'relationship_app'@'%';
+```
+
+Start this project's Redis service from the repository root:
 
 ```powershell
 docker compose -f docker-compose.dev.yml up -d
@@ -27,11 +35,10 @@ Copy-Item web/.env.example web/.env.local
 Copy-Item miniapp/.env.example miniapp/.env.local
 ```
 
-For the default development Compose configuration, set these values in
-`server/.env`:
+Set the shared MySQL connection and local settings in `server/.env`:
 
 ```dotenv
-DATABASE_URL="mysql://root:relationship_dev@127.0.0.1:3306/relationship"
+DATABASE_URL="mysql://relationship_app:<local-password>@127.0.0.1:3306/relationship"
 REDIS_URL="redis://127.0.0.1:6379"
 PUBLIC_BASE_URL="http://localhost:3000"
 AUTH_SECRET="relationship-local-development-secret"
@@ -57,7 +64,7 @@ npm install
 
 ## Run with hot reload
 
-To start the infrastructure, apply migrations, and launch the API, web client,
+To start Redis, apply migrations, and launch the API, web client,
 and mini program watch build in the background, run from the repository root:
 
 ```powershell
@@ -70,8 +77,8 @@ Runtime logs are written to `logs/local-dev`. Stop the host processes with:
 .\scripts\stop-local-dev.ps1
 ```
 
-Pass `-StopInfrastructure` to also stop MySQL and Redis. Their data remains in
-Docker volumes.
+Pass `-StopInfrastructure` to also stop Redis. Its data remains in the Docker
+volume; the shared MySQL instance is managed separately.
 
 You can also run each process in a separate terminal:
 
@@ -139,7 +146,7 @@ Browser Vue Devtools can inspect the web client running through Vite.
 Useful service commands:
 
 ```powershell
-docker compose -f docker-compose.dev.yml logs -f mysql redis
+docker compose -f docker-compose.dev.yml logs -f redis
 docker compose -f docker-compose.dev.yml restart
 docker compose -f docker-compose.dev.yml stop
 docker compose -f docker-compose.dev.yml down
